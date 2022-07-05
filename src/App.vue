@@ -1,17 +1,22 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <h1>Générateur de facture et devis</h1>
+  <p>
+    Notre générateur de facture en ligne permet à nimporte qui de facilement
+    créer des factures et des devis professionnelles au format PDF de manière
+    intuitive.
+  </p>
+  <Generateur />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Generateur from "./components/Generateur.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    Generateur,
+  },
+};
 </script>
 
 <style>
