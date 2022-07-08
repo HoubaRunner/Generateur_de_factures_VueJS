@@ -17,16 +17,18 @@
     <form class="form-style-9">
         <div class="d-flex align-items-center">
             <div>
-                <img name="Logo" id="Logo" src="./image/logo.jpg" />
+                <img name="Logo" id="Logo" class="logo ml-5 mt-5" src="./image/logo.jpg"
+                    style="border: 1px solid #4e66f8;" />
+                <img src="./image/eye.png" title="enable" class="iconForm eye" />
             </div>
             <div style="width: 20vw" class="B2">
                 <label for="Facture"> </label>
-                <input type="text" name="Facture" style="font-size: 35px" id="Facture" v-model="Facture"
-                    class="form-control" placeholder="Facture" />
+                <input type="text" name="Facture" style="font-size: 35px; border: 2px solid #4e66f8" id="Facture"
+                    v-model="Facture" class="form-control" placeholder="Facture" />
 
                 <label for="Referance"> </label>
-                <input type="text" name="Referance" class="form-control" id="Referance" v-model="Referance"
-                    placeholder="Référence (FAC-0001)" />
+                <input type="text" style=" border: 2px solid #4e66f8" name="Referance" class="form-control"
+                    id="Referance" v-model="Referance" placeholder="Référence (FAC-0001)" />
             </div>
         </div>
 
@@ -74,7 +76,7 @@
         </div>
         <br />
         <div class="blueLigne mt-5"></div>
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="myTable">
             <thead>
                 <tr class="bg-light">
                     <th class="text-center">Référence</th>
@@ -83,6 +85,7 @@
                     <th class="text-center">Prix unitaire</th>
                     <th class="text-center">TVA</th>
                     <th class="text-center" style="flex-wrap: nowrap;">Total HT</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -98,35 +101,34 @@
 
                     <td>
                         <input type="number" name="Quantity" id="Quantity" style="width:100px;" class="form-control"
-                            value="0" />
+                            value="0" onkeydown="calculer()" onclick="calculer() " />
                     </td>
 
                     <td>
                         <input type="number" name="unitPrix" id="unitPrix" style="width:170px;" class="form-control"
-                            value="0" />
+                            value="0" onkeydown="calculer()" onclick="calculer()" />
                     </td>
                     <td>
-                        <select class="form-select">
+                        <select class=" form-select">
                             <option value="0">0%</option>
                             <option value="7">7%</option>
                             <option value="13">13%</option>
                             <option value="19">19%</option>
                         </select>
                     </td>
-                    <td>0,000 DT</td>
+                    <td id="S1">0,000 DT</td>
                 </tr>
             </tbody>
         </table>
-        <br />
-        <div style="width: 100%;display: flex;justify-content: center;">
-            <select name="ajout" id="ajout" class="btn btn-primary btnForm mt-3">
-                <option value="produit">Ajouter un produit</option>
-                <option value="texte">Ajouter du texte</option>
-                <option value="section">Ajouter une section</option>
-                <option value="séparateur">Ajouter un séparateur</option>
-                <option value="total">Ajouter un sous-total</option>
-            </select>
+        <div class="text-center">
+            <button id="B1" type="button" class="btn btn-primary btnForm mt-3">Ajouter un produit</button>
+            <button id="B2" type="button" class="btn btn-primary btnForm mt-3">Ajouter du texte</button>
+            <button id="B3" type="button" class="btn btn-primary btnForm mt-3">Ajouter du Section</button>
+            <button id="B4" type="button" class="btn btn-primary btnForm mt-3">Ajouter un séparateur</button>
+            <button id="B5" type="button" class="btn btn-primary btnForm mt-3">Ajouter un sous-total</button>
         </div>
+        <br />
+
         <br>
 
 
@@ -139,10 +141,10 @@
                 <div class="blueLigne"></div>
                 <div style="width: 30vw" class=" mb-2 d-flex align-items-center">
                     <table class="table table-bordered">
-                        <tr>
-                            <td>TVA</td>
-                            <td>Base</td>
-                            <td>Montant</td>
+                        <tr class="bg-light">
+                            <td class="text-center">TVA</td>
+                            <td class="text-center">Base</td>
+                            <td class="text-center">Montant</td>
                         </tr>
                     </table>
                 </div>
@@ -152,7 +154,7 @@
                 <div class="blueLigne"></div>
                 <div style="width: 30vw" class=" mb-2 d-flex align-items-center">
                     <table class="table table-bordered">
-                        <tr>
+                        <tr class="bg-light">
                             <td>Total HT</td>
                             <td>0,000 DT </td>
                         </tr>
@@ -160,8 +162,9 @@
                             <td>Total TVA</td>
                             <td>0,000 DT </td>
                         </tr>
-                        <tr>
-                            <td colspan="2" class="timbre"> + Ajouter le timbre fiscal </td>
+                        <tr class="bg-light">
+                            <td colspan="2" id="ajoutTimbre" class="timbre" style="font-weight: bold;"> +
+                                Ajouter le timbre fiscal </td>
                         </tr>
                         <tr>
                             <td>Net à payer</td>
@@ -270,7 +273,15 @@
         background-color: #fff;
     }
 
+    .logo {
+        transition: box-shadow .3s !important;
+        width: 190px !important;
+        height: 170px !important;
 
+        border-radius: 10px !important;
+        border: 3px solid #4e66f8 !important;
+        background: #fff;
+    }
 
     h1 {
         border-bottom: 1px solid #ddd;
@@ -286,11 +297,6 @@
         display: flex;
         flex-direction: column;
         align-items: start;
-    }
-
-    #Logo {
-        height: 170px;
-        width: 190px;
     }
 
     .BB {
