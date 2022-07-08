@@ -76,7 +76,7 @@
         </div>
         <br />
         <div class="blueLigne mt-5"></div>
-        <table class="table table-bordered" id="myTable">
+        <table class="table table-bordered" id="myTable" oninput="calculer()">
             <thead>
                 <tr class="bg-light">
                     <th class="text-center">Référence</th>
@@ -101,12 +101,12 @@
 
                     <td>
                         <input type="number" name="Quantity" id="Quantity" style="width:100px;" class="form-control"
-                            value="0" onkeydown="calculer()" onclick="calculer() " />
+                            value="0" />
                     </td>
 
                     <td>
                         <input type="number" name="unitPrix" id="unitPrix" style="width:170px;" class="form-control"
-                            value="0" onkeydown="calculer()" onclick="calculer()" />
+                            value="0" />
                     </td>
                     <td>
                         <select class=" form-select">

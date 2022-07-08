@@ -65,7 +65,14 @@ document.querySelector(".timbre").addEventListener("click", handleTimbre)
 
 //function Date TODAY 
 document.getElementById('DC').value = new Date().toISOString().substring(0, 10);
-
+//function Produit Tab
+function calculer() {
+    var ProduitS = 1.00
+    var Quantity = parseInt(document.getElementById("Quantity").value);
+    var unitPrix = parseInt(document.getElementById("unitPrix").value);
+    ProduitS = Quantity * unitPrix;
+    document.getElementById("S1").innerHTML = ProduitS + ".00DT";
+}
 
 
 
@@ -130,11 +137,3 @@ $(document).ready(function () {
 });
 */
 
-//function
-function calculer() {
-    var ProduitS = 1.00
-    var Quantity = parseInt(document.getElementById("Quantity").value);
-    var unitPrix = parseInt(document.getElementById("unitPrix").value);
-    ProduitS = Quantity * unitPrix;
-    document.getElementById("S1").innerHTML = ProduitS;
-}
