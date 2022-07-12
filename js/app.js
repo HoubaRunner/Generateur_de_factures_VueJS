@@ -1,11 +1,13 @@
 //functio add ligne
 function addClientLigne(e) {
     e.preventDefault()
-    const element = `<div style="width:30vw" class="mt-2 mb-2 d-flex align-items-center"><input style="width:40%;margin-right:8px" placeholder="Label" class="form-control" type="text" />
+    const element = `<div style="width:40vw;padding-left: 20px;padding-right: 20px;margin-left:auto;margin-right:auto;" class="mt-2 mb-2 d-flex align-items-center"><input style="width:40%;margin-right:8px" placeholder="Label" class="form-control" type="text" />
             <input style="width:60%" type="text" class="form-control inputForm" name="sociale"
             />
             <img src="./image/minus.png" class="iconForm" onclick="removeC(this);" /></div>`
     const div = document.createElement("div")
+    div.style.marginLeft = "auto"
+    div.style.marginRight = "auto"
     div.innerHTML = element.trim()
     e.target.parentNode.insertBefore(div, e.target)
 }
@@ -186,8 +188,15 @@ logo.addEventListener("click", () => {
 
 inputImage.addEventListener("input", () => {
     if (inputImage.files[0]) {
-        logo.src = URL.createObjectURL(inputImage.files[0])
-        document.querySelector(".deleteIconPhoto").classList.remove("hideM")
+        if (inputImage.files[0].type.indexOf("png") == -1 && inputImage.files[0].type.indexOf("jpg") == -1 && inputImage.files[0].type.indexOf("jpeg") == -1) {
+            logo.src = defaultImage
+            document.querySelector(".deleteIconPhoto").classList.add("hideM")
+            inputImage.value = ""
+        }
+        else {
+            logo.src = URL.createObjectURL(inputImage.files[0])
+            document.querySelector(".deleteIconPhoto").classList.remove("hideM")
+        }
     }
     else {
         logo.src = defaultImage
