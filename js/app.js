@@ -14,6 +14,7 @@ function addClientLigne(e) {
 function removeC(element) {
     element.parentNode.parentNode.style.display = "none"
 }
+
 document.getElementById("addClientLigne").addEventListener("click", addClientLigne)
 document.getElementById("addDocLigne").addEventListener("click", addClientLigne)
 
