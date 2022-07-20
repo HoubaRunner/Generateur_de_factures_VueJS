@@ -22,7 +22,8 @@
 				<div
 					style="background-color: white;width:35%;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);padding:20px;display:flex;align-content: center;flex-direction: column;align-items: center;">
 					<div style="display: flex;align-items: center;justify-content: center;">
-						<input style="display: none;" v-model="imageInput" type="file" id="imageInput" @input="HandleInput" />
+						<input style="display: none;" v-model="imageInput" type="file" id="imageInput"
+							@input="HandleInput" />
 						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick"
 							style="border: 1px solid #4e66f8;" />
 						<img src="image/close.png" class="deleteIconPhoto hideM" />
@@ -132,7 +133,7 @@
 			<div
 				style="background-color:white;padding:30px;border-radius:15px;box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.137);">
 				<div>
-					<table class="mt-5 table table-bordered" id="myTable" @input="calculer">
+					<table class="mt-5 table table-bordered" id="myTable">
 						<thead>
 							<tr class="bg-light">
 								<th class="text-center">Référence</th>
@@ -157,22 +158,24 @@
 
 								<td>
 									<input type="number" name="Quantity" id="Quantity" v-model="Quantity"
-										style="width:100px;" class="form-control" value="0" />
+										style="width:100px;" placeholder="0" class="form-control" value="0"
+										@input="calculer" />
 								</td>
 
 								<td>
 									<input type="number" name="unitPrix" v-model="unitPrix" id="unitPrix"
-										style="width:170px;" class="form-control" value="0" />
+										style="width:170px;" placeholder="0" class="form-control" value="0"
+										@input="calculer" />
 								</td>
 								<td>
-									<select class=" form-select">
+									<select class=" form-select" id="choixTVA" name="choixTVA" @click="calculer">
 										<option value="0">0%</option>
 										<option value="7">7%</option>
 										<option value="13">13%</option>
 										<option value="19">19%</option>
 									</select>
 								</td>
-								<td id="S1">0,000 DT</td>
+								<td id="S1">0.000 DT</td>
 							</tr>
 						</tbody>
 					</table>
@@ -204,6 +207,11 @@
 									<td class="text-center">Base</td>
 									<td class="text-center">Montant</td>
 								</tr>
+								<tr>
+									<td class="text-center" id="T1">0%</td>
+									<td class="text-center" id="T2">00.000 DT</td>
+									<td class="text-center" id="T3">00.000 DT</td>
+								</tr>
 							</table>
 						</div>
 					</div>
@@ -212,11 +220,11 @@
 							<table class="table table-bordered">
 								<tr class="bg-light">
 									<td>Total HT</td>
-									<td>0,000 DT </td>
+									<td id="TT1">0.000 DT </td>
 								</tr>
 								<tr>
 									<td>Total TVA</td>
-									<td>0,000 DT </td>
+									<td id="TT2">0.000 DT </td>
 								</tr>
 								<tr class="bg-light">
 									<td colspan="2" id="ajoutTimbre" @click="handleTimbre" class="timbre"
@@ -225,7 +233,7 @@
 								</tr>
 								<tr>
 									<td>Net à payer</td>
-									<td>0,000 DT </td>
+									<td>0.000 DT </td>
 								</tr>
 							</table>
 						</div>
@@ -263,6 +271,7 @@
 					</div>
 				</div>
 			</div>
+			<button @click="persist" class="btn btn-primary btnForm mt">Sauvegader</button>
 		</form>
 	</div>
 
@@ -270,11 +279,40 @@
 		const app = Vue.createApp({
 			data() {
 				return {
-					text: ''
+					Facture: '',
+					Referance: '',
+					sociale: '',
+					fiscale: '',
+					Adresse: '',
+					DC: '',
+					DE: '',
+					INFORMATIONS: '',
+					Banque: '',
+
 				}
 			},
 			methods: {
 
+				calculer() {
+					var ProduitS = 1.00;
+					var Quantity = document.getElementById("Quantity").value;
+					var unitPrix = document.getElementById("unitPrix").value;
+					var TVA = document.getElementById("choixTVA").value;
+					document.getElementById("T1").innerHTML = TVA + "%";
+					ProduitS = parseFloat(Quantity * unitPrix).toFixed(3);
+					//Forumle TVA
+					var A1 = 1.00;
+					A1 = TVA * ProduitS
+					var Base = 1.00;
+					Base = parseFloat(A1 / 100).toFixed(3);
+					//APPEL
+					document.getElementById("S1").innerHTML = ProduitS + " DT";
+					document.getElementById("T2").innerHTML = ProduitS + " DT";
+					document.getElementById("TT1").innerHTML = ProduitS + " DT";
+					document.getElementById("T3").innerHTML = Base + " DT";
+					document.getElementById("TT2").innerHTML = Base + " DT";
+
+				},
 				handleDisabled(e) {
 
 					if (e.target.title == "enable") {
@@ -289,14 +327,6 @@
 						e.target.parentNode.children[0].style.opacity = 1
 						e.target.parentNode.children[1].disabled = false
 					}
-				},
-
-				calculer() {
-					var ProduitS = 1.00
-					var Quantity = parseInt(document.getElementById("Quantity").value);
-					var unitPrix = parseInt(document.getElementById("unitPrix").value);
-					ProduitS = Quantity * unitPrix;
-					document.getElementById("S1").innerHTML = ProduitS + ".00DT";
 				},
 
 				handleTimbre(e) {
@@ -330,21 +360,21 @@
                      
                             <td>
                                 <input type="text" class="form-control" id="tabref" name="tabref" placeholder="Référence"
-                                    value="" @input="calculer"/>
+                                    value="" />
                             </td>
                             <td>
                                 <input type="text" class="form-control" name="product" id="product"
-                                    placeholder="Produit / Service" value="" @input="calculer"/>
+                                    placeholder="Produit / Service" value="" />
                             </td>
 
                             <td>
                                 <input type="number" name="Quantity" id="Quantity" style="width:100px;" class="form-control"
-                                    value="0" @input="calculer"/>
+                                    value="0" />
                             </td>
 
                             <td>
                                 <input type="number" name="unitPrix" id="unitPrix" style="width:170px;" class="form-control"
-                                    value="0" @input="calculer"/>
+                                    value="0" />
                             </td>
                             <td>
                                 <select class=" form-select">
@@ -354,7 +384,7 @@
                                     <option value="19">19%</option>
                                 </select>
                             </td>
-                            <td id="S1" @input="calculer">0,000 DT</td>
+                            <td id="S1" @input="calculer">0.000 DT</td>
                       `
 					newElement.innerHTML = insideTheElement.trim()
 					container.appendChild(newElement)
@@ -393,16 +423,19 @@
 					td2.style.whiteSpace = "nowrap"
 					td2.innerText = "Sous total: "
 					newElement.appendChild(td2)
-					td3.innerText = "0,000 DT"
+					td3.innerText = "0.000 DT"
 					newElement.appendChild(td3)
 					container.appendChild(newElement)
 				},
+				removeC(e) {
 
+					e.style.display = "none"
+				},
 				addClientLigne(e) {
 					e.preventDefault()
 					const div = document.createElement("div")
 					const element = `<div style="width:40vw;padding-left: 20px;padding-right: 20px;margin-left:auto;margin-right:auto;" class="mt-2 mb-2 d-flex align-items-center"><input style="width:40%;margin-right:8px" placeholder="Label" class="form-control" type="text" />
-            		<input style="width:60%" type="text" class="form-control inputForm" name="sociale" />
+            		<input style="width:60%" type="text" class="form-control inputForm" name="label" />
             		<img src="./image/minus.png" class="iconForm" @click="removeC" /></div>`
 					div.style.marginLeft = "auto"
 					div.style.marginRight = "auto"
@@ -410,10 +443,7 @@
 					e.target.parentNode.insertBefore(div, e.target)
 				},
 
-				removeC(e) {
 
-					e.style.display = "none"
-				},
 				TriggerClick() {
 					const inputImage = document.getElementById("imageInput")
 					inputImage.click()
@@ -431,30 +461,96 @@
 					document.getElementById('DC').value = new Date().toISOString().substring(0, 10);
 				},
 				HandleInput() {
-				const inputImage = document.getElementById("imageInput")
-				const logo = document.getElementById("Logo")
-				const defaultImage = "./image/logo.jpg"
-				if (inputImage.files[0]) {
-					if (inputImage.files[0].type.indexOf("png") == -1 && inputImage.files[0].type.indexOf("jpg") == -1 && inputImage.files[0].type.indexOf("jpeg") == -1) {
-						logo.src = defaultImage
-						document.querySelector(".deleteIconPhoto").classList.add("hideM")
-						inputImage.value = ""
+					const inputImage = document.getElementById("imageInput")
+					const logo = document.getElementById("Logo")
+					const defaultImage = "./image/logo.jpg"
+					if (inputImage.files[0]) {
+						if (inputImage.files[0].type.indexOf("png") == -1 && inputImage.files[0].type.indexOf("jpg") == -1 && inputImage.files[0].type.indexOf("jpeg") == -1) {
+							logo.src = defaultImage
+							document.querySelector(".deleteIconPhoto").classList.add("hideM")
+							inputImage.value = ""
+						}
+						else {
+							logo.src = URL.createObjectURL(inputImage.files[0])
+							document.querySelector(".deleteIconPhoto").classList.remove("hideM")
+						}
 					}
 					else {
-						logo.src = URL.createObjectURL(inputImage.files[0])
-						document.querySelector(".deleteIconPhoto").classList.remove("hideM")
+						logo.src = defaultImage
+						document.querySelector(".deleteIconPhoto").classList.add("hideM")
 					}
-				}
-				else {
-					logo.src = defaultImage
-					document.querySelector(".deleteIconPhoto").classList.add("hideM")
-				}
 
-			}
+				},
+				persist() {
+					localStorage.Facture = this.Facture;
+					localStorage.Referance = this.Referance;
+					localStorage.sociale = this.sociale;
+					localStorage.fiscale = this.fiscale;
+					localStorage.Adresse = this.Adresse;
+					localStorage.DC = this.DC;
+					localStorage.DE = this.DE;
+					localStorage.INFORMATIONS = this.INFORMATIONS;
+					localStorage.Banque = this.Banque;
+
+					console.log('now pretend I did more stuff...');
+				},
 			},
 
 			mounted() {
+				if (localStorage.Facture) {
+					this.Facture = localStorage.Facture;
+				}
+				if (localStorage.Referance) {
+					this.Referance = localStorage.Referance;
+				}
+				if (localStorage.sociale) {
+					this.sociale = localStorage.sociale;
+				}
+				if (localStorage.fiscale) {
+					this.fiscale = localStorage.fiscale;
+				}
+				if (localStorage.Adresse) {
+					this.Adresse = localStorage.Adresse;
+				}
+				if (localStorage.DC) {
+					this.DC = localStorage.DC;
+				}
+				if (localStorage.DE) {
+					this.DE = localStorage.DE;
+				}
+				if (localStorage.INFORMATIONS) {
+					this.INFORMATIONS = localStorage.INFORMATIONS;
+				}
+				if (localStorage.Banque) {
+					this.Banque = localStorage.Banque;
+				}
 
+			},
+			watch: {
+				Facture(newFacture) {
+					localStorage.Facture = newFacture;
+				},
+				Referance(newReferance) {
+					localStorage.Referance = newReferance;
+				},
+				sociale(newsociale) {
+					localStorage.sociale = newsociale;
+				},
+				fiscale(newfiscale) {
+					localStorage.fiscale = newfiscale;
+				},
+				Adresse(newAdresse) {
+					localStorage.Adresse = newAdresse;
+				},
+				DC(newDC) {
+					localStorage.DC = newDC;
+				},
+				INFORMATIONS(newINFORMATIONS) {
+					localStorage.INFORMATIONS = newINFORMATIONS;
+				},
+				Banque(newBanque) {
+					localStorage.Banque = newBanque;
+				}
 			}
 		})
 
