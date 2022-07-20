@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>Generateur de facture</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -22,7 +22,7 @@
 				<div
 					style="background-color: white;width:35%;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);padding:20px;display:flex;align-content: center;flex-direction: column;align-items: center;">
 					<div style="display: flex;align-items: center;justify-content: center;">
-						<input style="display: none;" v-model="imageInput" type="file" id="imageInput"
+						<input style="display: none;" type="file" id="imageInput"
 							@input="HandleInput" />
 						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick"
 							style="border: 1px solid #4e66f8;" />
@@ -148,22 +148,22 @@
 						<tbody id="custom_select_result">
 							<tr>
 								<td>
-									<input type="text" class="form-control" v-model="tabref" id="tabref" name="tabref"
+									<input type="text" class="form-control" id="tabref" name="tabref"
 										placeholder="Référence" value="" />
 								</td>
 								<td>
-									<input type="text" class="form-control" v-model="product" name="product"
+									<input type="text" class="form-control" name="product"
 										id="product" placeholder="Produit / Service" value="" />
 								</td>
 
 								<td>
-									<input type="number" name="Quantity" id="Quantity" v-model="Quantity"
+									<input type="number" name="Quantity" id="Quantity"
 										style="width:100px;" placeholder="0" class="form-control" value="0"
 										@input="calculer" />
 								</td>
 
 								<td>
-									<input type="number" name="unitPrix" v-model="unitPrix" id="unitPrix"
+									<input type="number" name="unitPrix" id="unitPrix"
 										style="width:170px;" placeholder="0" class="form-control" value="0"
 										@input="calculer" />
 								</td>
@@ -288,7 +288,12 @@
 					DE: '',
 					INFORMATIONS: '',
 					Banque: '',
-
+					tabref: '',
+					product: '',
+					Quantity: '',
+					unitPrix:'',
+					Property:'',
+					IBAN:'',
 				}
 			},
 			methods: {
@@ -427,23 +432,22 @@
 					newElement.appendChild(td3)
 					container.appendChild(newElement)
 				},
-				removeC(e) {
-
-					e.style.display = "none"
-				},
 				addClientLigne(e) {
 					e.preventDefault()
 					const div = document.createElement("div")
 					const element = `<div style="width:40vw;padding-left: 20px;padding-right: 20px;margin-left:auto;margin-right:auto;" class="mt-2 mb-2 d-flex align-items-center"><input style="width:40%;margin-right:8px" placeholder="Label" class="form-control" type="text" />
             		<input style="width:60%" type="text" class="form-control inputForm" name="label" />
-            		<img src="./image/minus.png" class="iconForm" @click="removeC" /></div>`
+            		<img src="./image/minus.png" class="iconForm" @click="RemoveC"/>
+					</div>`
 					div.style.marginLeft = "auto"
 					div.style.marginRight = "auto"
 					div.innerHTML = element.trim()
 					e.target.parentNode.insertBefore(div, e.target)
 				},
-
-
+				removeC(e) {
+					console.log(e)
+					element.parentNode.style.display = "none"
+				},
 				TriggerClick() {
 					const inputImage = document.getElementById("imageInput")
 					inputImage.click()
