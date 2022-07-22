@@ -10,7 +10,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
-	<!-- <script src="./js/app.js" defer></script> -->
+	<script src="./js/app.js" defer></script>
 	<script src="https://unpkg.com/vue@3"></script>
 
 </head>
@@ -22,8 +22,7 @@
 				<div
 					style="background-color: white;width:35%;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);padding:20px;display:flex;align-content: center;flex-direction: column;align-items: center;">
 					<div style="display: flex;align-items: center;justify-content: center;">
-						<input style="display: none;" type="file" id="imageInput"
-							@input="HandleInput" />
+						<input style="display: none;" type="file" id="imageInput" @input="HandleInput" />
 						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick"
 							style="border: 1px solid #4e66f8;" />
 						<img src="image/close.png" class="deleteIconPhoto hideM" />
@@ -146,26 +145,24 @@
 							</tr>
 						</thead>
 						<tbody id="custom_select_result">
-							<tr>
+							<tr @click="deleteLigne(this); return false;">
 								<td>
 									<input type="text" class="form-control" id="tabref" name="tabref"
 										placeholder="Référence" value="" />
 								</td>
 								<td>
-									<input type="text" class="form-control" name="product"
-										id="product" placeholder="Produit / Service" value="" />
+									<input type="text" class="form-control" name="product" id="product"
+										placeholder="Produit / Service" value="" />
 								</td>
 
 								<td>
-									<input type="number" name="Quantity" id="Quantity"
-										style="width:100px;" placeholder="0" class="form-control" value="0"
-										@input="calculer" />
+									<input type="number" name="Quantity" id="Quantity" style="width:100px;"
+										placeholder="0" class="form-control" value="0" @input="calculer" />
 								</td>
 
 								<td>
-									<input type="number" name="unitPrix" id="unitPrix"
-										style="width:170px;" placeholder="0" class="form-control" value="0"
-										@input="calculer" />
+									<input type="number" name="unitPrix" id="unitPrix" style="width:170px;"
+										placeholder="0" class="form-control" value="0" @input="calculer" />
 								</td>
 								<td>
 									<select class=" form-select" id="choixTVA" name="choixTVA" @click="calculer">
@@ -176,6 +173,9 @@
 									</select>
 								</td>
 								<td id="S1">0.000 DT</td>
+								<td >
+									<img src="./image/delete.png" @click="deleteLigne(this); return false;" title="enable" class="iconForm eye" />
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -271,7 +271,14 @@
 					</div>
 				</div>
 			</div>
-			<button @click="persist" class="btn btn-primary btnForm mt">Sauvegader</button>
+
+			<div class="text-center ">
+				<br>
+				<button @click="setVal">Set Value</button>
+				<button @click="getVal">Get Value</button>
+				<button @click="removeVal">Remove Value</button>
+				<button type="reset">Reset Form</button>
+			</div>
 		</form>
 	</div>
 
@@ -287,35 +294,40 @@
 					DC: '',
 					DE: '',
 					INFORMATIONS: '',
-					Banque: '',
 					tabref: '',
 					product: '',
 					Quantity: '',
-					unitPrix:'',
-					Property:'',
-					IBAN:'',
+					unitPrix: '',
+					Property: '',
+					Banque: '',
+					IBAN: '',
+					textajout: '',
+					label: '',
 				}
 			},
 			methods: {
 
+				deleteLigne(element) {
+					element.parentNode.removeChild(element);
+				},
 				calculer() {
-					var ProduitS = 1.00;
-					var Quantity = document.getElementById("Quantity").value;
-					var unitPrix = document.getElementById("unitPrix").value;
-					var TVA = document.getElementById("choixTVA").value;
-					document.getElementById("T1").innerHTML = TVA + "%";
-					ProduitS = parseFloat(Quantity * unitPrix).toFixed(3);
+					var ProduitS = 1.00
+					var Quantity = document.getElementById("Quantity").value
+					var unitPrix = document.getElementById("unitPrix").value
+					var TVA = document.getElementById("choixTVA").value
+					document.getElementById("T1").innerHTML = TVA + "%"
+					ProduitS = parseFloat(Quantity * unitPrix).toFixed(3)
 					//Forumle TVA
-					var A1 = 1.00;
+					var A1 = 1.00
 					A1 = TVA * ProduitS
 					var Base = 1.00;
-					Base = parseFloat(A1 / 100).toFixed(3);
+					Base = parseFloat(A1 / 100).toFixed(3)
 					//APPEL
-					document.getElementById("S1").innerHTML = ProduitS + " DT";
-					document.getElementById("T2").innerHTML = ProduitS + " DT";
-					document.getElementById("TT1").innerHTML = ProduitS + " DT";
-					document.getElementById("T3").innerHTML = Base + " DT";
-					document.getElementById("TT2").innerHTML = Base + " DT";
+					document.getElementById("S1").innerHTML = ProduitS + " DT"
+					document.getElementById("T2").innerHTML = ProduitS + " DT"
+					document.getElementById("TT1").innerHTML = ProduitS + " DT"
+					document.getElementById("T3").innerHTML = Base + " DT"
+					document.getElementById("TT2").innerHTML = Base + " DT"
 
 				},
 				handleDisabled(e) {
@@ -363,7 +375,8 @@
 					const newElement = document.createElement('tr')
 					const insideTheElement = `
                      
-                            <td>
+                           <tr @click="deleteLigne(this)"> 
+							<td>
                                 <input type="text" class="form-control" id="tabref" name="tabref" placeholder="Référence"
                                     value="" />
                             </td>
@@ -390,6 +403,10 @@
                                 </select>
                             </td>
                             <td id="S1" @input="calculer">0.000 DT</td>
+							<td>
+								<img src="./image/delete.png" @click="deleteLigne(this); return false;" title="enable" class="iconForm eye" />
+							</td>
+							<tr>
                       `
 					newElement.innerHTML = insideTheElement.trim()
 					container.appendChild(newElement)
@@ -408,10 +425,10 @@
 				addText() {
 					const container = document.getElementById("custom_select_result")
 					const newElement = document.createElement("tr")
-					const td = document.createElement("td")
-					td.colSpan = "6"
-					newElement.appendChild(td)
-					td.innerHTML = "<textarea class='form-control form-control-lg'></textarea>".trim()
+					const td1 = document.createElement("td")
+					td1.colSpan = "6"
+					newElement.appendChild(td1)
+					td1.innerHTML = '<textarea id="textajout" name="textajout" class="form-control form-control-lg"></textarea>'.trim()
 					container.appendChild(newElement)
 				},
 				addSousTotal() {
@@ -420,9 +437,11 @@
 					const td1 = document.createElement("td")
 					const td2 = document.createElement("td")
 					const td3 = document.createElement("td")
+					const td4 = document.createElement("td4")
 					td1.classList.add("sep")
 					td2.classList.add("sep")
 					td3.classList.add("sep")
+					td4.classList.add("sep")
 					td1.colSpan = "4"
 					newElement.appendChild(td1)
 					td2.style.whiteSpace = "nowrap"
@@ -430,14 +449,18 @@
 					newElement.appendChild(td2)
 					td3.innerText = "0.000 DT"
 					newElement.appendChild(td3)
+					td4.innerHTML = '<img src="./image/delete.png" @click="deleteLigne(this); return false;" title="enable" class="iconForm eye" />'.trim()
+					td4.style.whiteSpace = "nowrap"
+					newElement.appendChild(td4)
 					container.appendChild(newElement)
 				},
 				addClientLigne(e) {
 					e.preventDefault()
 					const div = document.createElement("div")
 					const element = `<div style="width:40vw;padding-left: 20px;padding-right: 20px;margin-left:auto;margin-right:auto;" class="mt-2 mb-2 d-flex align-items-center"><input style="width:40%;margin-right:8px" placeholder="Label" class="form-control" type="text" />
-            		<input style="width:60%" type="text" class="form-control inputForm" name="label" />
-            		<img src="./image/minus.png" class="iconForm" @click="RemoveC"/>
+            		<input style="width:60%" type="text" class="form-control inputForm" id="label" name="label" />
+            		<img src="./image/minus.png" class="iconForm"/>
+
 					</div>`
 					div.style.marginLeft = "auto"
 					div.style.marginRight = "auto"
@@ -445,12 +468,7 @@
 					e.target.parentNode.insertBefore(div, e.target)
 				},
 				removeC(e) {
-					console.log(e)
-					element.parentNode.style.display = "none"
-				},
-				TriggerClick() {
-					const inputImage = document.getElementById("imageInput")
-					inputImage.click()
+					element.parentNode.parentNode.style.display = "none"
 				},
 
 				closeMenu(label) {
@@ -464,6 +482,12 @@
 				DateToday() {
 					document.getElementById('DC').value = new Date().toISOString().substring(0, 10);
 				},
+
+				TriggerClick() {
+					const inputImage = document.getElementById("imageInput")
+					inputImage.click()
+				},
+
 				HandleInput() {
 					const inputImage = document.getElementById("imageInput")
 					const logo = document.getElementById("Logo")
@@ -485,76 +509,195 @@
 					}
 
 				},
-				persist() {
-					localStorage.Facture = this.Facture;
-					localStorage.Referance = this.Referance;
-					localStorage.sociale = this.sociale;
-					localStorage.fiscale = this.fiscale;
-					localStorage.Adresse = this.Adresse;
-					localStorage.DC = this.DC;
-					localStorage.DE = this.DE;
-					localStorage.INFORMATIONS = this.INFORMATIONS;
-					localStorage.Banque = this.Banque;
-
-					console.log('now pretend I did more stuff...');
+				setVal() {
+					localStorage.setItem('Facture', this.Facture)
+					localStorage.setItem('Referance', this.Referance)
+					localStorage.setItem('sociale', this.sociale)
+					localStorage.setItem('fiscale', this.fiscale)
+					localStorage.setItem('Adresse', this.Adresse)
+					localStorage.setItem('DC', this.DC)
+					localStorage.setItem('DE', this.DE)
+					localStorage.setItem('INFORMATIONS', this.INFORMATIONS)
+					localStorage.setItem('Banque', this.Banque)
+					localStorage.setItem('IBAN', this.IBAN)
+					//Champs Ajouter :
+					localStorage.setItem('label', this.label)
+					localStorage.setItem('tabref', this.tabref)
+					localStorage.setItem('product', this.product)
+					localStorage.setItem('Quantity', this.Quantity)
+					localStorage.setItem('unitPrix', this.unitPrix)
+					localStorage.setItem('Property', this.Property)
+					localStorage.setItem('textajout', this.textajout)
 				},
+				getVal() {
+					this.Facture = localStorage.getItem('Facture')
+					this.Referance = localStorage.getItem('Referance')
+					this.sociale = localStorage.getItem('sociale')
+					this.fiscale = localStorage.getItem('fiscale')
+					this.Adresse = localStorage.getItem('Adresse')
+					this.DC = localStorage.getItem('DC')
+					this.DE = localStorage.getItem('DE')
+					this.INFORMATIONS = localStorage.getItem('INFORMATIONS')
+					this.Banque = localStorage.getItem('Banque')
+					this.IBAN = localStorage.getItem('IBAN')
+					//Champs Ajouter :
+					this.label = localStorage.getItem('label')
+					this.tabref = localStorage.getItem('tabref')
+					this.product = localStorage.getItem('product')
+					this.Quantity = localStorage.getItem('Quantity')
+					this.unitPrix = localStorage.getItem('unitPrix')
+					this.Property = localStorage.getItem('Property')
+					this.textajout = localStorage.getItem('textajout')
+				},
+				removeVal() {
+					localStorage.removeItem('Facture');
+					this.Facture = ''
+					localStorage.removeItem('Referance');
+					this.Referance = ''
+					localStorage.removeItem('sociale');
+					this.sociale = ''
+					localStorage.removeItem('fiscale');
+					this.fiscale = ''
+					localStorage.removeItem('Adresse');
+					this.Adresse = ''
+					localStorage.removeItem('DC');
+					this.DC = ''
+					localStorage.removeItem('DE');
+					this.DE = ''
+					localStorage.removeItem('INFORMATIONS');
+					this.INFORMATIONS = ''
+					localStorage.removeItem('Banque');
+					this.Banque = ''
+					localStorage.removeItem('IBAN');
+					this.IBAN = ''
+					localStorage.removeItem('label');
+					this.label = ''
+					localStorage.removeItem('product');
+					this.product = ''
+					localStorage.removeItem('tabref');
+					this.tabref = ''
+					localStorage.removeItem('Quantity');
+					this.Quantity = ''
+					localStorage.removeItem('unitPrix');
+					this.unitPrix = ''
+					localStorage.removeItem('Property');
+					this.Property = ''
+					localStorage.removeItem('textajout');
+					this.textajout = ''
+
+				}
 			},
 
 			mounted() {
 				if (localStorage.Facture) {
-					this.Facture = localStorage.Facture;
+					this.Facture = localStorage.Facture
 				}
 				if (localStorage.Referance) {
-					this.Referance = localStorage.Referance;
+					this.Referance = localStorage.Referance
 				}
 				if (localStorage.sociale) {
-					this.sociale = localStorage.sociale;
+					this.sociale = localStorage.sociale
 				}
 				if (localStorage.fiscale) {
-					this.fiscale = localStorage.fiscale;
+					this.fiscale = localStorage.fiscale
 				}
 				if (localStorage.Adresse) {
-					this.Adresse = localStorage.Adresse;
+					this.Adresse = localStorage.Adresse
 				}
 				if (localStorage.DC) {
-					this.DC = localStorage.DC;
+					this.DC = localStorage.DC
 				}
 				if (localStorage.DE) {
-					this.DE = localStorage.DE;
+					this.DE = localStorage.DE
 				}
 				if (localStorage.INFORMATIONS) {
-					this.INFORMATIONS = localStorage.INFORMATIONS;
+					this.INFORMATIONS = localStorage.INFORMATIONS
 				}
 				if (localStorage.Banque) {
-					this.Banque = localStorage.Banque;
+					this.Banque = localStorage.Banque
 				}
+				if (localStorage.IBAN) {
+					this.IBAN = localStorage.IBAN
+				}
+				//Champs Ajouter :
+				if (localStorage.label) {
+					this.label = localStorage.label
+				}
+				if (localStorage.tabref) {
+					this.tabref = localStorage.tabref
+				}
+				if (localStorage.product) {
+					this.product = localStorage.product
+				}
+				if (localStorage.Quantity) {
+					this.Quantity = localStorage.Quantity
+				}
+				if (localStorage.unitPrix) {
+					this.unitPrix = localStorage.unitPrix
+				}
+				if (localStorage.Property) {
+					this.Property = localStorage.Property
+				}
+				if (localStorage.textajout) {
+					this.textajout = localStorage.textajout
+				}
+
 
 			},
 			watch: {
 				Facture(newFacture) {
-					localStorage.Facture = newFacture;
+					localStorage.Facture = newFacture
 				},
 				Referance(newReferance) {
-					localStorage.Referance = newReferance;
+					localStorage.Referance = newReferance
 				},
 				sociale(newsociale) {
-					localStorage.sociale = newsociale;
+					localStorage.sociale = newsociale
 				},
 				fiscale(newfiscale) {
-					localStorage.fiscale = newfiscale;
+					localStorage.fiscale = newfiscale
 				},
 				Adresse(newAdresse) {
-					localStorage.Adresse = newAdresse;
+					localStorage.Adresse = newAdresse
 				},
 				DC(newDC) {
-					localStorage.DC = newDC;
+					localStorage.DC = newDC
+				},
+				DE(newDE) {
+					localStorage.DE = newDE
 				},
 				INFORMATIONS(newINFORMATIONS) {
-					localStorage.INFORMATIONS = newINFORMATIONS;
+					localStorage.INFORMATIONS = newINFORMATIONS
 				},
 				Banque(newBanque) {
-					localStorage.Banque = newBanque;
-				}
+					localStorage.Banque = newBanque
+				},
+				IBAN(newIBAN) {
+					localStorage.IBAN = newIBAN
+				},
+				//Champs Ajouter :
+				label(newlabel) {
+					localStorage.label = newlabel
+				},
+				tabref(newtabref) {
+					localStorage.tabref = newtabref
+				},
+				product(newproduct) {
+					localStorage.product = newproduct
+				},
+				Quantity(newQuantity) {
+					localStorage.Quantity = newQuantity
+				},
+				unitPrix(newunitPrix) {
+					localStorage.unitPrix = newunitPrix
+				},
+				Property(newProperty) {
+					localStorage.Property = newProperty
+				},
+				textajout(newtextajout) {
+					localStorage.textajout = newtextajout
+				},
+
 			}
 		})
 
@@ -563,6 +706,18 @@
 	</script>
 
 	<style>
+		.flex-parent {
+			display: flex;
+		}
+
+		.jc-center {
+			justify-content: center;
+		}
+
+		button.margin-right {
+			margin-right: 20px;
+		}
+
 		.deleteIconPhoto {
 			height: 20px;
 			width: 20px;
