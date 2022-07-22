@@ -173,8 +173,9 @@
 									</select>
 								</td>
 								<td id="S1">0.000 DT</td>
-								<td >
-									<img src="./image/delete.png" @click="deleteLigne(this); return false;" title="enable" class="iconForm eye" />
+								<td>
+									<img src="./image/delete.png" @click="deleteLigne(this); return false;"
+										title="enable" class="iconForm eye" />
 								</td>
 							</tr>
 						</tbody>
@@ -414,11 +415,14 @@
 				addSep() {
 					const container = document.getElementById("custom_select_result")
 					const newElement = document.createElement("tr")
-					const td = document.createElement("td")
-					td.colSpan = "6"
-					newElement.appendChild(td)
-					newElement.classList.add("sep")
-					td.innerHTML = "<div></div>".trim()
+					const td1 = document.createElement("td")
+					const td2 = document.createElement("td")
+					td1.colSpan = "6"
+					newElement.appendChild(td1)
+					td1.classList.add("sep")
+					td1.innerHTML = "<div></div>".trim()
+					td2.innerHTML = '<img src="./image/delete.png" @click="deleteLigne(this); return false;"  class="iconForm eye" />'.trim()
+					newElement.appendChild(td2)
 					container.appendChild(newElement)
 				},
 
@@ -426,9 +430,12 @@
 					const container = document.getElementById("custom_select_result")
 					const newElement = document.createElement("tr")
 					const td1 = document.createElement("td")
+					const td2 = document.createElement("td")
 					td1.colSpan = "6"
 					newElement.appendChild(td1)
 					td1.innerHTML = '<textarea id="textajout" name="textajout" class="form-control form-control-lg"></textarea>'.trim()
+					newElement.appendChild(td2)
+					td2.innerHTML = '<img src="./image/delete.png" @click="deleteLigne(this); return false;"  class="iconForm eye" />'.trim()
 					container.appendChild(newElement)
 				},
 				addSousTotal() {
@@ -437,11 +444,10 @@
 					const td1 = document.createElement("td")
 					const td2 = document.createElement("td")
 					const td3 = document.createElement("td")
-					const td4 = document.createElement("td4")
+					const td4 = document.createElement("td")
 					td1.classList.add("sep")
 					td2.classList.add("sep")
 					td3.classList.add("sep")
-					td4.classList.add("sep")
 					td1.colSpan = "4"
 					newElement.appendChild(td1)
 					td2.style.whiteSpace = "nowrap"
@@ -449,7 +455,7 @@
 					newElement.appendChild(td2)
 					td3.innerText = "0.000 DT"
 					newElement.appendChild(td3)
-					td4.innerHTML = '<img src="./image/delete.png" @click="deleteLigne(this); return false;" title="enable" class="iconForm eye" />'.trim()
+					td4.innerHTML = '<img src="./image/delete.png" @click="deleteLigne(this); return false;"  class="iconForm eye" />'.trim()
 					td4.style.whiteSpace = "nowrap"
 					newElement.appendChild(td4)
 					container.appendChild(newElement)
