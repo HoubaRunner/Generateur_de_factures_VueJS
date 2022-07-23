@@ -25,8 +25,8 @@
 						<input style="display: none;" type="file" id="imageInput" @input="HandleInput" />
 						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick"
 							style="border: 1px solid #4e66f8;" />
-						<img src="image/close.png" class="deleteIconPhoto hideM" />
-						<img src="./image/eye.png" @click="handleDisabled" title="enable" class="iconForm eye" />
+						<img src="image/close.png" @click="deleteImage" class="deleteIconPhoto hideM" />
+						<img src="./image/eye.png" @click="handleDisabledImage" title="enable" class="iconForm eye" />
 					</div>
 					<div style="width: 20vw;margin-left: auto;margin-right: auto;" class="B2">
 						<label for="Facture"> </label>
@@ -42,28 +42,17 @@
 					style="margin-left:20px;box-sizing: content-box;padding:40px;background-color: white;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);height:440px;width:62%;">
 					<h2 style="text-align: center;margin-bottom: 30px;font-weight: bold;font-size: 35px;">Générateur de
 						facture et devis gratuit</h2>
-					<p style="text-align: center;">Notre générateur de facture en ligne permet à n’importe qui de
-						facilement créer des factures et des devis
-						professionnelles au format PDF de manière intuitive.</p>
-					<p style="text-align: center;">Notre générateur de facture en ligne permet à n’importe qui de
-						facilement créer des
-						factures et des devis
-						professionnelles au format PDF de manière intuitive.</p>
-					<p style="text-align: center;">Notre générateur de facture en ligne permet à n’importe qui de
-						facilement créer des factures et des devis
-						professionnelles au format PDF de manière intuitive.</p>
-					<p style="text-align: center;">Notre générateur de facture en ligne permet à n’importe qui de
-						facilement créer des
-						factures et des devis
-						professionnelles au format PDF de manière intuitive.</p>
-					<p style="text-align: center;">Notre générateur de facture en ligne permet à n’importe qui de
-						facilement créer des
-						factures et des devis
-						professionnelles au format PDF de manière intuitive.</p>
-					<p style="text-align: center;">Notre générateur de facture en ligne permet à n’importe qui de
-						facilement créer des
-						factures et des devis
-						professionnelles au format PDF de manière intuitive.</p>
+					<h3>Remplissez les champs</h3>
+					<p>Ajoutez vos informations de paiement ainsi que toute autre information importante pour votre client. Vous pouvez par
+					exemple préciser la méthode de paiement à privilégier.</p>
+					<h3>Aperçu</h3>
+					<p>Cliquez sur “Aperçu” afin de voir à quoi ressemble votre facture avant de l’envoyer ; nous sommes certains que vous
+					allez l’aimer.
+					Nous avons passé des années à développer et à améliorer le design de nos modèles de factures de manière à ce qu’ils
+					soient intuitifs, pratiques à utiliser, mais surtout professionnels.</p>
+					<h3>Téléchargez votre PDF</h3>
+					<p>Une fois satisfait(e) de l’aperçu de votre facture, c’est le moment de la télécharger au format pdf. Vous n’avez plus
+					ensuite qu’à l’envoyer à votre client !</p>
 				</div>
 			</div>
 
@@ -141,11 +130,11 @@
 								<th class="text-center">Prix unitaire</th>
 								<th class="text-center">TVA</th>
 								<th class="text-center" style="flex-wrap: nowrap;">Total HT</th>
-
+								<th></th>
 							</tr>
 						</thead>
 						<tbody id="custom_select_result">
-							<tr @click="deleteLigne(this); return false;">
+							<tr>
 								<td>
 									<input type="text" class="form-control" id="tabref" name="tabref"
 										placeholder="Référence" value="" />
@@ -173,9 +162,8 @@
 									</select>
 								</td>
 								<td id="S1">0.000 DT</td>
-								<td>
-									<img src="./image/delete.png" @click="deleteLigne(this); return false;"
-										title="enable" class="iconForm eye" />
+								<td style="min-width: 60px;">
+									
 								</td>
 							</tr>
 						</tbody>
@@ -202,7 +190,7 @@
 					class="d-flex mt-5">
 					<div class="B35">
 						<div style="width: 30vw" class="d-flex align-items-center">
-							<table class="table table-bordered">
+							<table class="table table-bordered" id="tableResult">
 								<tr class="bg-light">
 									<td class="text-center">TVA</td>
 									<td class="text-center">Base</td>
@@ -210,15 +198,15 @@
 								</tr>
 								<tr>
 									<td class="text-center" id="T1">0%</td>
-									<td class="text-center" id="T2">00.000 DT</td>
-									<td class="text-center" id="T3">00.000 DT</td>
+									<td class="text-center" id="T2">0.000 DT</td>
+									<td class="text-center" id="T3">0.000 DT</td>
 								</tr>
 							</table>
 						</div>
 					</div>
 					<div class="B35">
 						<div style="width: 30vw" class="d-flex align-items-center">
-							<table class="table table-bordered">
+							<table class="table table-bordered" id="tabOfTotal">
 								<tr class="bg-light">
 									<td>Total HT</td>
 									<td id="TT1">0.000 DT </td>
@@ -234,7 +222,7 @@
 								</tr>
 								<tr>
 									<td>Net à payer</td>
-									<td>0.000 DT </td>
+									<td id="finalResult">0.000 DT</td>
 								</tr>
 							</table>
 						</div>
@@ -303,7 +291,8 @@
 					Banque: '',
 					IBAN: '',
 					textajout: '',
-					label: '',
+					label: '', 
+					toggleTimbre : false,
 				}
 			},
 			methods: {
@@ -326,13 +315,12 @@
 					//APPEL
 					document.getElementById("S1").innerHTML = ProduitS + " DT"
 					document.getElementById("T2").innerHTML = ProduitS + " DT"
-					document.getElementById("TT1").innerHTML = ProduitS + " DT"
 					document.getElementById("T3").innerHTML = Base + " DT"
-					document.getElementById("TT2").innerHTML = Base + " DT"
-
+					this.calculTotalAfterChange()
+					this.calculTVAAfterChange()
+					this.calculTotaux()
 				},
 				handleDisabled(e) {
-
 					if (e.target.title == "enable") {
 						e.target.title = "disable"
 						e.target.src = "./image/hidden.png"
@@ -346,16 +334,34 @@
 						e.target.parentNode.children[1].disabled = false
 					}
 				},
-
+				handleDisabledImage(e){
+					const image = document.getElementById("Logo")
+					const input = document.getElementById("imageInput")
+					if (e.target.title == "enable") {
+						e.target.title = "disable"
+						e.target.src = "./image/hidden.png"
+						image.style.opacity="0.3"
+						input.disabled=true
+					}
+					else {
+						e.target.title = "enable"
+						e.target.src = "./image/eye.png"
+						image.style.opacity = "1"
+						input.disabled = false
+					}
+				},
 				handleTimbre(e) {
 					var timbreValue = "0.600"
 					if (e.target.innerText == "- Timbre fiscal") {
 						e.target.innerText = "+ Ajouter le timbre fiscal"
+						e.target.style.textAlign = "center"
 						e.target.colSpan = "2"
 						e.target.parentNode.children[1].style.display = "none"
+						this.calculTotaux()
 					}
 					else {
 						e.target.innerText = "- Timbre fiscal"
+						e.target.style.textAlign="left"
 						e.target.colSpan = "1"
 						if (e.target.parentNode.children[1]) {
 							e.target.parentNode.children[1].style.display = "flex"
@@ -365,52 +371,200 @@
 							td.innerText = timbreValue + " DT"
 							e.target.parentNode.appendChild(td)
 						}
+						this.calculTotaux(0.6)
 					}
-
 				},
 				handleMenu() {
 					document.querySelector(".hideMenu").classList.toggle("hideM")
 				},
 				addProduct() {
 					const container = document.getElementById("custom_select_result")
-					const newElement = document.createElement('tr')
-					const insideTheElement = `
-                     
-                           <tr @click="deleteLigne(this)"> 
-							<td>
-                                <input type="text" class="form-control" id="tabref" name="tabref" placeholder="Référence"
-                                    value="" />
-                            </td>
-                            <td>
-                                <input type="text" class="form-control" name="product" id="product"
-                                    placeholder="Produit / Service" value="" />
-                            </td>
+					const container2 = document.createElement("tr")
+					const tr = document.createElement("tr")
+					const td = document.createElement("td")
+					const image = document.createElement("img")
+					image.src = "./image/delete.png"
+					image.classList.add("iconForm", "eye")
+					td.appendChild(image)
+					tr.appendChild(td)
 
-                            <td>
-                                <input type="number" name="Quantity" id="Quantity" style="width:100px;" class="form-control"
-                                    value="0" />
-                            </td>
 
-                            <td>
-                                <input type="number" name="unitPrix" id="unitPrix" style="width:170px;" class="form-control"
-                                    value="0" />
-                            </td>
-                            <td>
-                                <select class=" form-select">
-                                    <option value="0">0%</option>
+					/*td input reference*/
+					const tdRef = document.createElement("td")
+					const inputRef = document.createElement("input")
+					inputRef.classList.add("form-control")
+					inputRef.placeholder="Référence"
+					tdRef.appendChild(inputRef)
+					/*td input PS*/
+					const tdPS = document.createElement("td")
+					const inputPS = document.createElement("input")
+					inputPS.classList.add("form-control")
+					inputPS.placeholder = "Produit / Service"
+					tdPS.appendChild(inputPS)
+					/*td input Quantity*/
+					const tdQuantity = document.createElement("td")
+					const inputQuantity = document.createElement("input")
+					inputQuantity.type="number"
+					inputQuantity.classList.add("form-control")
+					inputQuantity.style.width="100px"
+					inputQuantity.value=0
+					tdQuantity.appendChild(inputQuantity)
+					/*td input Unitaire*/
+					const tdUnitaire = document.createElement("td")
+					const inputUnitaire = document.createElement("input")
+					inputUnitaire.type = "number"
+					inputUnitaire.classList.add("form-control")
+					inputUnitaire.style.width = "170px"
+					inputUnitaire.value = 0
+					tdUnitaire.appendChild(inputUnitaire)
+					/*td select*/
+					const tdSelect = document.createElement("td")
+					const select = document.createElement("select")
+					select.classList.add("form-select")
+					select.innerHTML=`<option value="0">0%</option>
                                     <option value="7">7%</option>
                                     <option value="13">13%</option>
-                                    <option value="19">19%</option>
-                                </select>
-                            </td>
-                            <td id="S1" @input="calculer">0.000 DT</td>
-							<td>
-								<img src="./image/delete.png" @click="deleteLigne(this); return false;" title="enable" class="iconForm eye" />
-							</td>
-							<tr>
-                      `
-					newElement.innerHTML = insideTheElement.trim()
-					container.appendChild(newElement)
+                                    <option value="19">19%</option>`
+					tdSelect.appendChild(select)
+					const result = document.createElement("td")
+					/*result*/
+					result.innerText="0.000 DT"
+					// <td>
+					// 	<input type="text" class="form-control"/>
+					// </td >
+					// <td>
+					// 	<input type="text" class="form-control" name="product" id="product"
+					// 		placeholder="Produit / Service" value="" />
+					// </td>
+
+					// <td>
+					// 	<input type="number" name="Quantity" id="Quantity" style="width:100px;" class="form-control"
+					// 		value="0" />
+					// </td>
+
+					// <td>
+					// 	<input type="number" name="unitPrix" id="unitPrix" style="width:170px;" class="form-control"
+					// 		value="0" />
+					// </td>
+					// <td>
+					// 	<select class=" form-select">
+					// 		<option value="0">0%</option>
+					// 		<option value="7">7%</option>
+					// 		<option value="13">13%</option>
+					// 		<option value="19">19%</option>
+					// 	</select>
+					// </td>
+					container2.appendChild(tdRef)
+					container2.appendChild(tdPS)
+					container2.appendChild(tdQuantity)
+					container2.appendChild(tdUnitaire)
+					container2.appendChild(tdSelect)
+					container2.appendChild(result)
+					container2.appendChild(td)
+					container.appendChild(container2)
+
+
+					/*add to result */ 
+
+					const tableResult = document.getElementById("tableResult") 
+					const trTableResult= document.createElement("tr")
+					const tva = document.createElement("td")
+					const base = document.createElement("td")
+					const montant = document.createElement("td")
+					tva.innerText="0%"
+					base.innerText = "0.000 DT"
+					montant.innerText = "0.000 DT"
+					tva.classList.add("textCenter")
+					base.classList.add("textCenter")
+					montant.classList.add("textCenter")
+
+					trTableResult.appendChild(tva)
+					trTableResult.appendChild(base)
+					trTableResult.appendChild(montant)
+					tableResult.appendChild(trTableResult)
+					select.oninput = () => {
+						tva.innerText = select.value + "%"
+						montant.innerText =  parseFloat((select.value * inputUnitaire.value * inputQuantity.value)/100).toFixed(3) + " DT"
+						this.calculTVAAfterChange()
+						this.calculTotaux()
+					}
+					inputUnitaire.oninput = () => {
+						base.innerText = parseFloat(inputUnitaire.value * inputQuantity.value).toFixed(3)+" DT"
+						montant.innerText = parseFloat((select.value * inputUnitaire.value * inputQuantity.value) / 100).toFixed(3) + " DT"
+						result.innerText = parseFloat(inputUnitaire.value * inputQuantity.value).toFixed(3) + " DT"
+						this.calculTotalAfterChange()
+						this.calculTotaux()
+					}
+					inputQuantity.oninput = () => {
+						base.innerText = parseFloat(inputUnitaire.value * inputQuantity.value).toFixed(3) + " DT"
+						montant.innerText = parseFloat((select.value * inputUnitaire.value * inputQuantity.value) / 100).toFixed(3) + " DT"
+						result.innerText= parseFloat(inputUnitaire.value * inputQuantity.value).toFixed(3) + " DT"
+						this.calculTotalAfterChange()
+						this.calculTotaux()
+					}
+					image.onclick = () => {
+						container2.remove()
+						trTableResult.remove()
+						this.calculTotalAfterChange()
+						this.calculTVAAfterChange()
+						this.calculTotaux()
+					}
+				},
+				calculTotaux(nbr = 0) {
+					var result = 0 
+					const trTable = document.querySelectorAll("#tabOfTotal tr")
+					trTable.forEach((element , index) => {
+						const td = element.childNodes
+						if(trTable.length-1!=index)
+						{
+							if (index == 2) {
+								if (nbr) {
+									result += Number(td[1].innerText.split(" ")[0])
+								}
+							}
+							else {
+								result += Number(td[1].innerText.split(" ")[0])
+							}
+						}
+					})
+					document.getElementById("finalResult").innerHTML = parseFloat(result).toFixed(3) + " DT"
+				},
+				calculTotalAfterChange() {
+					const tableResult = document.getElementById("tableResult")
+					const trTable = document.querySelectorAll("#tableResult tr")
+					var result = 0
+					trTable.forEach((element,index)=>{
+						if(index!=0)
+						{
+							const td = element.childNodes
+							result += Number(td[1].innerText.split(" ")[0])
+						}
+					})
+					document.getElementById("TT1").innerHTML = parseFloat(result).toFixed(3) + " DT"
+
+					// const ajoutTimbre = document.getElementById("ajoutTimbre")
+					// ajoutTimbre.innerText = "+ Ajouter le timbre fiscal"
+					// ajoutTimbre.style.textAlign = "center"
+					// ajoutTimbre.colSpan = "2"
+					// ajoutTimbre.parentNode.children[1].style.display = "none"
+				},
+				calculTVAAfterChange(){
+					const tableResult = document.getElementById("tableResult")
+					const trTable = document.querySelectorAll("#tableResult tr")
+					var result = 0
+					trTable.forEach((element, index) => {
+						if (index != 0) {
+							const td = element.childNodes
+							result += Number(td[2].innerText.split(" ")[0])
+						}
+					})
+					document.getElementById("TT2").innerHTML = parseFloat(result).toFixed(3) + " DT"
+
+					// const ajoutTimbre = document.getElementById("ajoutTimbre")
+					// ajoutTimbre.innerText = "+ Ajouter le timbre fiscal"
+					// ajoutTimbre.style.textAlign = "center"
+					// ajoutTimbre.colSpan = "2"
+					// ajoutTimbre.parentNode.children[1].style.display = "none"
 				},
 				addSep() {
 					const container = document.getElementById("custom_select_result")
@@ -421,7 +575,13 @@
 					newElement.appendChild(td1)
 					td1.classList.add("sep")
 					td1.innerHTML = "<div></div>".trim()
-					td2.innerHTML = '<img src="./image/delete.png" @click="deleteLigne(this); return false;"  class="iconForm eye" />'.trim()
+					const image = document.createElement("img")
+					image.src="./image/delete.png"
+					image.classList.add("iconForm","eye")
+					td2.appendChild(image)
+					image.onclick=()=>{
+						newElement.remove()
+					}
 					newElement.appendChild(td2)
 					container.appendChild(newElement)
 				},
@@ -435,7 +595,13 @@
 					newElement.appendChild(td1)
 					td1.innerHTML = '<textarea id="textajout" name="textajout" class="form-control form-control-lg"></textarea>'.trim()
 					newElement.appendChild(td2)
-					td2.innerHTML = '<img src="./image/delete.png" @click="deleteLigne(this); return false;"  class="iconForm eye" />'.trim()
+					const image = document.createElement("img")
+					image.src="./image/delete.png"
+					image.onclick=()=>{
+						newElement.remove()
+					}
+					td2.appendChild(image)
+					image.classList.add("iconForm","eye")
 					container.appendChild(newElement)
 				},
 				addSousTotal() {
@@ -455,7 +621,13 @@
 					newElement.appendChild(td2)
 					td3.innerText = "0.000 DT"
 					newElement.appendChild(td3)
-					td4.innerHTML = '<img src="./image/delete.png" @click="deleteLigne(this); return false;"  class="iconForm eye" />'.trim()
+					const image = document.createElement("img")
+					image.classList.add("iconForm","eye")
+					image.src="./image/delete.png"
+					image.onclick=()=>{
+						newElement.remove()
+					}
+					td4.appendChild(image)
 					td4.style.whiteSpace = "nowrap"
 					newElement.appendChild(td4)
 					container.appendChild(newElement)
@@ -463,14 +635,35 @@
 				addClientLigne(e) {
 					e.preventDefault()
 					const div = document.createElement("div")
-					const element = `<div style="width:40vw;padding-left: 20px;padding-right: 20px;margin-left:auto;margin-right:auto;" class="mt-2 mb-2 d-flex align-items-center"><input style="width:40%;margin-right:8px" placeholder="Label" class="form-control" type="text" />
-            		<input style="width:60%" type="text" class="form-control inputForm" id="label" name="label" />
-            		<img src="./image/minus.png" class="iconForm"/>
+					// const element = `<div style="width:40vw;padding-left: 20px;padding-right: 20px;margin-left:auto;margin-right:auto;" class="mt-2 mb-2 d-flex align-items-center">
+					// <input placeholder="Label" class="form-control inputAdd" type="text" />
+            		// <input type="text" class="form-control inputForm inputAdd2" id="label" name="label" />
+            		// <img class="iconForm"/>
+					// </div>`
 
-					</div>`
+					const container = document.createElement("div") 
+					container.style.width="40vw"
+					container.style.paddingLeft="20px"
+					container.style.paddingRight = "20px"
+					container.style.marginLeft="auto"
+					container.style.marginRight = "auto"
+					container.classList.add("mt-2","mb-2","d-flex","align-items-center")
+					const input1 = document.createElement("input")
+					input1.classList.add("form-control","inputAdd")
+					const input2 = document.createElement("input")
+					input2.classList.add("form-control","inputForm","inputAdd2")
+					const image = document.createElement("img")
+					image.src= "./image/minus.png"
+					image.classList.add("iconForm")
+					container.appendChild(input1)
+					container.appendChild(input2)
+					container.appendChild(image)
+					image.onclick=()=>{
+						div.remove()
+					}
 					div.style.marginLeft = "auto"
 					div.style.marginRight = "auto"
-					div.innerHTML = element.trim()
+					div.appendChild(container)
 					e.target.parentNode.insertBefore(div, e.target)
 				},
 				removeC(e) {
@@ -514,6 +707,14 @@
 						document.querySelector(".deleteIconPhoto").classList.add("hideM")
 					}
 
+				},
+				deleteImage(){
+					const inputImage = document.getElementById("imageInput")
+					const logo = document.getElementById("Logo")
+					const defaultImage = "./image/logo.jpg"
+					logo.src = defaultImage
+					document.querySelector(".deleteIconPhoto").classList.add("hideM")
+					inputImage.value = ""
 				},
 				setVal() {
 					localStorage.setItem('Facture', this.Facture)
@@ -715,7 +916,10 @@
 		.flex-parent {
 			display: flex;
 		}
-
+		.textCenter 
+		{
+			text-align: center;
+		}
 		.jc-center {
 			justify-content: center;
 		}
@@ -733,7 +937,15 @@
 			right: 27px;
 			bottom: 100px;
 		}
-
+		.inputAdd 
+		{
+			width:40%;
+			margin-right:8px;
+		}
+		.inputAdd2 
+		{
+			width:60%;
+		}
 		.hideMenu {
 			/* display: none; */
 			position: absolute;
@@ -851,13 +1063,6 @@
 			background: #fff;
 			cursor: pointer;
 		}
-
-		h1 {
-			border-bottom: 1px solid #ddd;
-			display: inline-block;
-			padding-bottom: 10px;
-		}
-
 		.B2 {
 			margin-left: auto;
 		}
