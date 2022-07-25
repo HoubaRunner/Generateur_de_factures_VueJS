@@ -110,7 +110,7 @@
 						<img src="./image/eye.png" @click="handleDisabled" title="enable" class="iconForm eye" />
 					</div>
 					<svg style="border-radius:75%;cursor: pointer;margin-left: auto;box-sizing: content-box;margin-top:20px;padding:7px;background-color: #007bff;border:0px solid #007bff; margin-right: auto;"
-						id="addDocLigne" @click="addClientLigne" xmlns="http://www.w3.org/2000/svg" width="40"
+						id="addDocLigne" @click="addDocLigne" xmlns="http://www.w3.org/2000/svg" width="40"
 						height="40" fill="white" class="bi bi-plus" viewBox="0 0 16 16">
 						<path
 							d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
@@ -143,18 +143,16 @@
 									<input type="text" class="form-control" name="product" id="product"
 										placeholder="Produit / Service" value="" />
 								</td>
-
 								<td>
 									<input type="number" name="Quantity" id="Quantity" style="width:100px;"
 										placeholder="0" class="form-control" value="0" @input="calculer" />
 								</td>
-
 								<td>
 									<input type="number" name="unitPrix" id="unitPrix" style="width:170px;"
 										placeholder="0" class="form-control" value="0" @input="calculer" />
 								</td>
 								<td>
-									<select class=" form-select" id="choixTVA" name="choixTVA" @click="calculer">
+									<select class="form-control" id="choixTVA" name="choixTVA" @click="calculer">
 										<option value="0">0%</option>
 										<option value="7">7%</option>
 										<option value="13">13%</option>
@@ -261,12 +259,12 @@
 				</div>
 			</div>
 
-			<div class="text-center ">
+			<div class="text-center mt-4">
 				<br>
-				<button @click="setVal">Set Value</button>
-				<button @click="getVal">Get Value</button>
-				<button @click="removeVal">Remove Value</button>
-				<button type="reset">Reset Form</button>
+				<button class="btn btn-primary mx-1" @click="setVal">Set Value</button>
+				<button class="btn btn-primary mx-1" @click="getVal">Get Value</button>
+				<button class="btn btn-primary mx-1" @click="removeVal">Remove Value</button>
+				<button class="btn btn-primary mx-1" type="reset">Reset Form</button>
 			</div>
 		</form>
 	</div>
@@ -296,11 +294,22 @@
 				}
 			},
 			methods: {
-
 				deleteLigne(element) {
 					element.parentNode.removeChild(element);
 				},
-				calculer() {
+				getBase64Image(img) {
+					var canvas = document.createElement("canvas");
+					canvas.width = img.width;
+					canvas.height = img.height;
+
+					var ctx = canvas.getContext("2d");
+					ctx.drawImage(img, 0, 0);
+
+					var dataURL = canvas.toDataURL("image/png");
+
+					return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+				}
+				,calculer() {
 					var ProduitS = 1.00
 					var Quantity = document.getElementById("Quantity").value
 					var unitPrix = document.getElementById("unitPrix").value
@@ -319,6 +328,7 @@
 					this.calculTotalAfterChange()
 					this.calculTVAAfterChange()
 					this.calculTotaux()
+					this.calculSousTotal()
 				},
 				handleDisabled(e) {
 					if (e.target.title == "enable") {
@@ -488,12 +498,14 @@
 						this.calculTVAAfterChange()
 						this.calculTotaux()
 					}
+					select.classList.add("form-control")
 					inputUnitaire.oninput = () => {
 						base.innerText = parseFloat(inputUnitaire.value * inputQuantity.value).toFixed(3)+" DT"
 						montant.innerText = parseFloat((select.value * inputUnitaire.value * inputQuantity.value) / 100).toFixed(3) + " DT"
 						result.innerText = parseFloat(inputUnitaire.value * inputQuantity.value).toFixed(3) + " DT"
 						this.calculTotalAfterChange()
 						this.calculTotaux()
+						this.calculSousTotal()
 					}
 					inputQuantity.oninput = () => {
 						base.innerText = parseFloat(inputUnitaire.value * inputQuantity.value).toFixed(3) + " DT"
@@ -501,6 +513,7 @@
 						result.innerText= parseFloat(inputUnitaire.value * inputQuantity.value).toFixed(3) + " DT"
 						this.calculTotalAfterChange()
 						this.calculTotaux()
+						this.calculSousTotal()
 					}
 					image.onclick = () => {
 						container2.remove()
@@ -508,7 +521,9 @@
 						this.calculTotalAfterChange()
 						this.calculTVAAfterChange()
 						this.calculTotaux()
+						this.calculSousTotal()
 					}
+					this.calculSousTotal()
 				},
 				calculTotaux(nbr = 0) {
 					var result = 0 
@@ -528,6 +543,24 @@
 						}
 					})
 					document.getElementById("finalResult").innerHTML = parseFloat(result).toFixed(3) + " DT"
+				},
+				calculSousTotal(){
+					const trs = document.querySelectorAll("#custom_select_result tr")
+					var result = 0
+					trs.forEach((element,index)=>{
+							const tds = element.childNodes 
+							if(tds[5])
+							{
+								result += Number(tds[5].innerText.split(" ")[0])
+							}
+							else 
+							{
+								if (tds[1].title == "st") {
+									tds[2].innerText = parseFloat(result).toFixed(3) + " DT"
+									result = 0
+								}
+							}
+					})
 				},
 				calculTotalAfterChange() {
 					const tableResult = document.getElementById("tableResult")
@@ -585,7 +618,6 @@
 					newElement.appendChild(td2)
 					container.appendChild(newElement)
 				},
-
 				addText() {
 					const container = document.getElementById("custom_select_result")
 					const newElement = document.createElement("tr")
@@ -611,13 +643,14 @@
 					const td2 = document.createElement("td")
 					const td3 = document.createElement("td")
 					const td4 = document.createElement("td")
-					td1.classList.add("sep")
-					td2.classList.add("sep")
-					td3.classList.add("sep")
+					td1.classList.add("sepGray")
+					td2.classList.add("sepGray")
+					td3.classList.add("sepGray")
 					td1.colSpan = "4"
 					newElement.appendChild(td1)
 					td2.style.whiteSpace = "nowrap"
 					td2.innerText = "Sous total: "
+					td2.title="st"
 					newElement.appendChild(td2)
 					td3.innerText = "0.000 DT"
 					newElement.appendChild(td3)
@@ -631,15 +664,45 @@
 					td4.style.whiteSpace = "nowrap"
 					newElement.appendChild(td4)
 					container.appendChild(newElement)
+					this.calculSousTotal()
 				},
-				addClientLigne(e) {
-					e.preventDefault()
+				generateID(number){
+					var id = ""
+					for (let index = 0; index < number; index++) {
+						id+= parseInt(Math.random() * 10)
+					}
+					return id
+				},
+				autoAddClients(){
+					const clientLignes = JSON.parse(localStorage.client)
+					clientLignes.forEach(element => {
+						this.addClientLigne(null , element.key , element.value , element.id)
+					});
+				},
+				autoAddDocuments() {
+					const documentLignes = JSON.parse(localStorage.document)
+					documentLignes.forEach(element => {
+						this.addDocLigne(null, element.key, element.value, element.id)
+					});
+				},
+				addClientLigne(e = null , key = "" , value = "" , id2 = null ) {
 					const div = document.createElement("div")
 					// const element = `<div style="width:40vw;padding-left: 20px;padding-right: 20px;margin-left:auto;margin-right:auto;" class="mt-2 mb-2 d-flex align-items-center">
 					// <input placeholder="Label" class="form-control inputAdd" type="text" />
             		// <input type="text" class="form-control inputForm inputAdd2" id="label" name="label" />
             		// <img class="iconForm"/>
 					// </div>`
+
+
+					var id = id2 || this.generateID(5)
+					if(!id2)
+					{
+						localStorage.client = JSON.stringify([...JSON.parse(localStorage.client), {
+							id: id,
+							key: "",
+							value: ""
+						}])
+					}
 
 					const container = document.createElement("div") 
 					container.style.width="40vw"
@@ -649,8 +712,22 @@
 					container.style.marginRight = "auto"
 					container.classList.add("mt-2","mb-2","d-flex","align-items-center")
 					const input1 = document.createElement("input")
+					input1.oninput = (e) => {
+						var old = JSON.parse(localStorage.client).filter((element) => element.id === id)[0]
+						old.key = e.target.value
+						localStorage.client = JSON.stringify([...JSON.parse(localStorage.client).filter((element) => element.id != id), old])
+					}
+					input1.value = key
+					input1.placeholder = "Label"
 					input1.classList.add("form-control","inputAdd")
 					const input2 = document.createElement("input")
+					input2.oninput = (e) => {
+						var old = JSON.parse(localStorage.client).filter((element) => element.id === id)[0]
+						old.value=e.target.value
+						localStorage.client = JSON.stringify([...JSON.parse(localStorage.client).filter((element) => element.id != id),old])
+					}
+					input2.value = value
+					input2.placeholder="Value"
 					input2.classList.add("form-control","inputForm","inputAdd2")
 					const image = document.createElement("img")
 					image.src= "./image/minus.png"
@@ -660,11 +737,70 @@
 					container.appendChild(image)
 					image.onclick=()=>{
 						div.remove()
+						localStorage.client = JSON.stringify([...JSON.parse(localStorage.client).filter((element) => element.id != id)])
 					}
 					div.style.marginLeft = "auto"
 					div.style.marginRight = "auto"
 					div.appendChild(container)
-					e.target.parentNode.insertBefore(div, e.target)
+					const addClientLigne = document.getElementById("addClientLigne")
+					addClientLigne.parentNode.insertBefore(div, addClientLigne)
+				},
+				addDocLigne(e = null, key = "", value = "", id2 = null){
+					const div = document.createElement("div")
+					// const element = `<div style="width:40vw;padding-left: 20px;padding-right: 20px;margin-left:auto;margin-right:auto;" class="mt-2 mb-2 d-flex align-items-center">
+					// <input placeholder="Label" class="form-control inputAdd" type="text" />
+					// <input type="text" class="form-control inputForm inputAdd2" id="label" name="label" />
+					// <img class="iconForm"/>
+					// </div>`
+
+					var id = id2 || this.generateID(5)
+					if (!id2) {
+						localStorage.document = JSON.stringify([...JSON.parse(localStorage.document), {
+							id: id,
+							key: "",
+							value: ""
+						}])
+					}
+					const container = document.createElement("div")
+					container.style.width = "40vw"
+					container.style.paddingLeft = "20px"
+					container.style.paddingRight = "20px"
+					container.style.marginLeft = "auto"
+					container.style.marginRight = "auto"
+					container.classList.add("mt-2", "mb-2", "d-flex", "align-items-center")
+					const input1 = document.createElement("input")
+					input1.value = key
+					input1.oninput = (e) => {
+						var old = JSON.parse(localStorage.document).filter((element) => element.id === id)[0]
+						old.key = e.target.value
+						localStorage.document = JSON.stringify([...JSON.parse(localStorage.document).filter((element) => element.id != id), old])
+					}
+					input1.classList.add("form-control", "inputAdd")
+					input1.placeholder="Label"
+					const input2 = document.createElement("input")
+					input2.value = value
+					input2.oninput = (e) => {
+						var old = JSON.parse(localStorage.document).filter((element) => element.id === id)[0]
+						old.value = e.target.value
+						localStorage.document = JSON.stringify([...JSON.parse(localStorage.document).filter((element) => element.id != id), old])
+					}
+					input2.classList.add("form-control", "inputForm", "inputAdd2")
+					input2.placeholder="Value"
+					const image = document.createElement("img")
+					image.src = "./image/minus.png"
+					image.classList.add("iconForm")
+					container.appendChild(input1)
+					container.appendChild(input2)
+					container.appendChild(image)
+					image.onclick = () => {
+						div.remove()
+						localStorage.document = JSON.stringify([...JSON.parse(localStorage.document).filter((element) => element.id != id)])
+					}
+					div.style.marginLeft = "auto"
+					div.style.marginRight = "auto"
+					div.appendChild(container)
+					const addDocBtn = document.getElementById("addDocLigne")
+					addDocBtn.parentNode.insertBefore(div, addDocBtn)
 				},
 				removeC(e) {
 					element.parentNode.parentNode.style.display = "none"
@@ -686,7 +822,6 @@
 					const inputImage = document.getElementById("imageInput")
 					inputImage.click()
 				},
-
 				HandleInput() {
 					const inputImage = document.getElementById("imageInput")
 					const logo = document.getElementById("Logo")
@@ -700,11 +835,13 @@
 						else {
 							logo.src = URL.createObjectURL(inputImage.files[0])
 							document.querySelector(".deleteIconPhoto").classList.remove("hideM")
+							localStorage.logo = this.getBase64Image(logo)
 						}
 					}
 					else {
 						logo.src = defaultImage
 						document.querySelector(".deleteIconPhoto").classList.add("hideM")
+						localStorage.logo = ""
 					}
 
 				},
@@ -715,6 +852,7 @@
 					logo.src = defaultImage
 					document.querySelector(".deleteIconPhoto").classList.add("hideM")
 					inputImage.value = ""
+					localStorage.logo = ""
 				},
 				setVal() {
 					localStorage.setItem('Facture', this.Facture)
@@ -796,6 +934,27 @@
 			},
 
 			mounted() {
+				if(localStorage.logo)
+				{
+					const logo = document.getElementById("Logo")
+					logo.src= `data:image/png;base64,${localStorage.logo}`
+				}
+				if(!localStorage.client)
+				{
+					localStorage.client = JSON.stringify([])
+				}
+				else 
+				{
+					this.autoAddClients()
+				}
+				if (!localStorage.document) {
+					localStorage.document = JSON.stringify([])
+				}
+				else 
+				{
+					this.autoAddDocuments()
+				}
+				
 				if (localStorage.Facture) {
 					this.Facture = localStorage.Facture
 				}
@@ -964,9 +1123,13 @@
 
 		.sep {
 			height: 50px;
+		}
+		.sepGray 
+		{
+			height: 50px;
 			background-color: #21252918;
 		}
-
+		/* background-color: #21252918; */
 		.sep div {
 			height: 7px;
 			width: 97%;
