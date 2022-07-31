@@ -10,8 +10,13 @@
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
 	<script src="./js/app.js" defer></script>
 	<script src="https://unpkg.com/vue@3"></script>
+	<!---->
+	<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jspdf-html2canvas@latest/dist/jspdf-html2canvas.min.js"></script>
 </head>
 
 <body>
@@ -37,8 +42,7 @@
 							id="Referance" v-model="Referance" placeholder="Référence (FAC-0001)" />
 					</div>
 				</div>
-				<div
-					style="margin-left:20px;box-sizing: content-box;padding:40px;background-color: white;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);height:440px;width:62%;">
+				<div id="descs" style="margin-left:20px;box-sizing: content-box;padding:40px;background-color: white;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);height:440px;width:62%;">
 					<h2 style="text-align: center;margin-bottom: 30px;font-weight: bold;font-size: 35px;">Générateur de
 						facture et devis gratuit</h2>
 					<h3>Remplissez les champs</h3>
@@ -109,14 +113,13 @@
 						class="mt-2 mb-2 d-flex align-items-center">
 						<label for="DC" class="labelForm">Date de création : </label>
 						<input type="date" class="form-control inputForm" name="DC" id="DC" v-model="DC"
-							v-html="DateToday" placeholder="Raison sociale" />
+							v-html="DateToday" placeholder="dd/mm/yyyy" />
 						<img src="./image/eye.png" @click="handleDisabled" title="enable" class="iconForm eye" />
 					</div>
 					<div style="width: 40vw;padding-left: 20px;padding-right: 20px;margin-left: auto;margin-right: auto;"
 						class="mt-2 mb-2 d-flex align-items-center">
 						<label for="DE" class="labelForm">Date d'échéance : </label>
-						<input type="date" class="form-control inputForm" name="DE" id="DE" v-model="DE"
-							placeholder="Matricule fiscale" />
+						<input type="date" class="form-control inputForm" name="DE" id="DE" v-model="DE" placeholder="dd/mm/yyyy" />
 						<img src="./image/eye.png" @click="handleDisabled" title="enable" class="iconForm eye" />
 					</div>
 					<svg style="border-radius:75%;cursor: pointer;margin-left: auto;box-sizing: content-box;margin-top:20px;padding:7px;background-color: #007bff;border:0px solid #007bff; margin-right: auto;"
@@ -269,12 +272,12 @@
 				</div>
 			</div>
 
-			<div class="text-center mt-4">
+			<div class="text-center mt-4" id="btns">
 				<br>
 				<button class="btn btn-primary mx-1" @click="setVal">Définir la valeur</button>
 				<button class="btn btn-primary mx-1" @click="getVal">Obtenir de la valeur</button>
 				<button class="btn btn-primary mx-1" @click="removeVal">Supprimer la valeur</button>
-				<button class="btn btn-primary mx-1" @click="generatePDF" type="reset">Réinitialisation de formulaire </button>
+				<button class="btn btn-primary mx-1" @click="generatePDF" type="reset">Télécharger Votre PDF </button>
 			</div>
 		</form>
 	</div>
@@ -283,7 +286,6 @@
 	<script >	
 		const app = Vue.createApp({
 			data() {
-				
 				return {
 					Facture: '',
 					Referance: '',
@@ -302,7 +304,8 @@
 					RIB: '',
 					textajout: '',
 					label: '', 
-					toggleTimbre : false,
+					toggleTimbre : false, 
+					jspdf : new window.jspdf.jsPDF()
 				}
 			},
 			methods: {
@@ -709,13 +712,13 @@
 					return id
 				},
 				autoAddClients(){
-					const clientLignes = JSON.parse(localStorage.client)
+					const clientLignes = JSON.parse(localStorage.fact)[0].client
 					clientLignes.forEach(element => {
 						this.addClientLigne(null , element.key , element.value , element.id)
 					});
 				},
 				autoAddDocuments() {
-					const documentLignes = JSON.parse(localStorage.document)
+					const documentLignes = JSON.parse(localStorage.fact)[0].document
 					documentLignes.forEach(element => {
 						this.addDocLigne(null, element.key, element.value, element.id)
 					});
@@ -732,11 +735,15 @@
 					var id = id2 || this.generateID(5)
 					if(!id2)
 					{
-						localStorage.client = JSON.stringify([...JSON.parse(localStorage.client), {
+						const old = JSON.parse(localStorage.fact)[0]
+						old.client = [...(old.client), {
 							id: id,
 							key: "",
 							value: ""
-						}])
+						}]
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, old)
+						localStorage.fact = JSON.stringify(table)
 					}
 
 					const container = document.createElement("div") 
@@ -748,18 +755,28 @@
 					container.classList.add("mt-2","mb-2","d-flex","align-items-center")
 					const input1 = document.createElement("input")
 					input1.oninput = (e) => {
-						var old = JSON.parse(localStorage.client).filter((element) => element.id === id)[0]
+						var old = JSON.parse(localStorage.fact)[0].client.filter((element) => element.id === id)[0]
 						old.key = e.target.value
-						localStorage.client = JSON.stringify([...JSON.parse(localStorage.client).filter((element) => element.id != id), old])
+						const old2 = [...JSON.parse(localStorage.fact)[0].client.filter((element) => element.id != id), old]
+						const hold = JSON.parse(localStorage.fact)[0]
+						hold.client = old2
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, hold)
+						localStorage.fact = JSON.stringify(table)
 					}
 					input1.value = key
 					input1.placeholder = "Label"
 					input1.classList.add("form-control","inputAdd")
 					const input2 = document.createElement("input")
 					input2.oninput = (e) => {
-						var old = JSON.parse(localStorage.client).filter((element) => element.id === id)[0]
-						old.value=e.target.value
-						localStorage.client = JSON.stringify([...JSON.parse(localStorage.client).filter((element) => element.id != id),old])
+						var old = JSON.parse(localStorage.fact)[0].client.filter((element) => element.id === id)[0]
+						old.value = e.target.value
+						const old2 = [...JSON.parse(localStorage.fact)[0].client.filter((element) => element.id != id), old]
+						const hold = JSON.parse(localStorage.fact)[0]
+						hold.client = old2
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, hold)
+						localStorage.fact = JSON.stringify(table)
 					}
 					input2.value = value
 					input2.placeholder="Value"
@@ -772,7 +789,11 @@
 					container.appendChild(image)
 					image.onclick=()=>{
 						div.remove()
-						localStorage.client = JSON.stringify([...JSON.parse(localStorage.client).filter((element) => element.id != id)])
+						const old = JSON.parse(localStorage.fact)[0]
+						old.client = old.client.filter((element) => element.id != id)
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, old)
+						localStorage.fact = JSON.stringify(table)
 					}
 					div.style.marginLeft = "auto"
 					div.style.marginRight = "auto"
@@ -790,11 +811,15 @@
 
 					var id = id2 || this.generateID(5)
 					if (!id2) {
-						localStorage.document = JSON.stringify([...JSON.parse(localStorage.document), {
+						const old = JSON.parse(localStorage.fact)[0]
+						old.document = [...(old.document), {
 							id: id,
 							key: "",
 							value: ""
-						}])
+						}]
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, old)
+						localStorage.fact = JSON.stringify(table)
 					}
 					const container = document.createElement("div")
 					container.style.width = "40vw"
@@ -806,18 +831,28 @@
 					const input1 = document.createElement("input")
 					input1.value = key
 					input1.oninput = (e) => {
-						var old = JSON.parse(localStorage.document).filter((element) => element.id === id)[0]
+						var old = JSON.parse(localStorage.fact)[0].document.filter((element) => element.id === id)[0]
 						old.key = e.target.value
-						localStorage.document = JSON.stringify([...JSON.parse(localStorage.document).filter((element) => element.id != id), old])
+						const old2 = [...JSON.parse(localStorage.fact)[0].document.filter((element) => element.id != id), old]
+						const hold = JSON.parse(localStorage.fact)[0]
+						hold.document=old2 
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, hold)
+						localStorage.fact = JSON.stringify(table)
 					}
 					input1.classList.add("form-control", "inputAdd")
 					input1.placeholder="Label"
 					const input2 = document.createElement("input")
 					input2.value = value
 					input2.oninput = (e) => {
-						var old = JSON.parse(localStorage.document).filter((element) => element.id === id)[0]
+						var old = JSON.parse(localStorage.fact)[0].document.filter((element) => element.id === id)[0]
 						old.value = e.target.value
-						localStorage.document = JSON.stringify([...JSON.parse(localStorage.document).filter((element) => element.id != id), old])
+						const old2 = [...JSON.parse(localStorage.fact)[0].document.filter((element) => element.id != id), old]
+						const hold = JSON.parse(localStorage.fact)[0]
+						hold.document = old2
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, hold)
+						localStorage.fact = JSON.stringify(table)
 					}
 					input2.classList.add("form-control", "inputForm", "inputAdd2")
 					input2.placeholder="Value"
@@ -829,7 +864,11 @@
 					container.appendChild(image)
 					image.onclick = () => {
 						div.remove()
-						localStorage.document = JSON.stringify([...JSON.parse(localStorage.document).filter((element) => element.id != id)])
+						const old = JSON.parse(localStorage.fact)[0]
+						old.document = old.document.filter((element) => element.id != id)
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, old)
+						localStorage.fact = JSON.stringify(table)
 					}
 					div.style.marginLeft = "auto"
 					div.style.marginRight = "auto"
@@ -870,13 +909,21 @@
 						else {
 							logo.src = URL.createObjectURL(inputImage.files[0])
 							document.querySelector(".deleteIconPhoto").classList.remove("hideM")
-							localStorage.logo = this.getBase64Image(logo)
+							const old = JSON.parse(localStorage.fact)[0]
+							old.logo = this.getBase64Image(logo)
+							var table = JSON.parse(localStorage.fact);
+							table.splice(0, 1, old)
+							localStorage.fact = JSON.stringify(table)
 						}
 					}
 					else {
 						logo.src = defaultImage
 						document.querySelector(".deleteIconPhoto").classList.add("hideM")
-						localStorage.logo = ""
+						const old = JSON.parse(localStorage.fact)[0]
+						old.logo = ""
+						var table = JSON.parse(localStorage.fact);
+						table.splice(0, 1, old)
+						localStorage.fact = JSON.stringify(table)
 					}
 
 				},
@@ -887,216 +934,244 @@
 					logo.src = defaultImage
 					document.querySelector(".deleteIconPhoto").classList.add("hideM")
 					inputImage.value = ""
-					localStorage.logo = ""
+					const old = JSON.parse(localStorage.fact)[0]
+					old.logo = ""
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
-				setVal() {
-					localStorage.setItem('Facture', this.Facture)
-					localStorage.setItem('Referance', this.Referance)
-					localStorage.setItem('sociale', this.sociale)
-					localStorage.setItem('fiscale', this.fiscale)
-					localStorage.setItem('Adresse', this.Adresse)
-					localStorage.setItem('DC', this.DC)
-					localStorage.setItem('DE', this.DE)
-					localStorage.setItem('INFORMATIONS', this.INFORMATIONS)
-					localStorage.setItem('Banque', this.Banque)
-					localStorage.setItem('RIB', this.RIB)
-					//Champs Ajouter :
-					localStorage.setItem('label', this.label)
-					localStorage.setItem('tabref', this.tabref)
-					localStorage.setItem('product', this.product)
-					localStorage.setItem('Quantity', this.Quantity)
-					localStorage.setItem('unitPrix', this.unitPrix)
-					localStorage.setItem('Property', this.Property)
-					localStorage.setItem('textajout', this.textajout)
-				},
-				getVal() {
-					this.Facture = localStorage.getItem('Facture')
-					this.Referance = localStorage.getItem('Referance')
-					this.sociale = localStorage.getItem('sociale')
-					this.fiscale = localStorage.getItem('fiscale')
-					this.Adresse = localStorage.getItem('Adresse')
-					this.DC = localStorage.getItem('DC')
-					this.DE = localStorage.getItem('DE')
-					this.INFORMATIONS = localStorage.getItem('INFORMATIONS')
-					this.Banque = localStorage.getItem('Banque')
-					this.RIB = localStorage.getItem('RIB')
-					//Champs Ajouter :
-					this.label = localStorage.getItem('label')
-					this.tabref = localStorage.getItem('tabref')
-					this.product = localStorage.getItem('product')
-					this.Quantity = localStorage.getItem('Quantity')
-					this.unitPrix = localStorage.getItem('unitPrix')
-					this.Property = localStorage.getItem('Property')
-					this.textajout = localStorage.getItem('textajout')
-				},
-				removeVal() {
-					localStorage.removeItem('Facture');
-					this.Facture = ''
-					localStorage.removeItem('Referance');
-					this.Referance = ''
-					localStorage.removeItem('sociale');
-					this.sociale = ''
-					localStorage.removeItem('fiscale');
-					this.fiscale = ''
-					localStorage.removeItem('Adresse');
-					this.Adresse = ''
-					localStorage.removeItem('DC');
-					this.DC = ''
-					localStorage.removeItem('DE');
-					this.DE = ''
-					localStorage.removeItem('INFORMATIONS');
-					this.INFORMATIONS = ''
-					localStorage.removeItem('Banque');
-					this.Banque = ''
-					localStorage.removeItem('RIB');
-					this.RIB = ''
-					localStorage.removeItem('label');
-					this.label = ''
-					localStorage.removeItem('product');
-					this.product = ''
-					localStorage.removeItem('tabref');
-					this.tabref = ''
-					localStorage.removeItem('Quantity');
-					this.Quantity = ''
-					localStorage.removeItem('unitPrix');
-					this.unitPrix = ''
-					localStorage.removeItem('Property');
-					this.Property = ''
-					localStorage.removeItem('textajout');
-					this.textajout = ''
+				generatePDF(){
+					const html2PDF = window.html2PDF 
+					/*remove*/
+					const descs = document.getElementById("descs")
+					descs.classList.toggle("hideM")
+					const eyes = document.querySelectorAll(".eye")
+					eyes.forEach(element => {
+						element.classList.toggle("hideM")
+					});
+					const btns = document.getElementById("btns")
+					btns.classList.toggle("hideM")
+					document.body.style.backgroundColor = "white"
+					const addClientLigne = document.getElementById("addClientLigne")
+					addClientLigne.classList.toggle("hideM")
+					const addDocLigne = document.getElementById("addDocLigne")
+					addDocLigne.classList.toggle("hideM")
+					const toogleMenu = document.getElementById("toogleMenu")
+					toogleMenu.classList.toggle("hideM")
+					
+					/*options*/
+					const opt = {
+						margin: 1,
+						filename: 'myfile.pdf',
+						image: { type: 'jpeg', quality: 0.98 },
+						html2canvas: { scale: 2 },
+						jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+					}
+					html2PDF(document.body,opt).then(()=>{
+						descs.classList.toggle("hideM")
+						eyes.forEach(element => {
+							element.classList.toggle("hideM")
+						});
+						btns.classList.toggle("hideM")
+						document.body.style.backgroundColor=""
+						addClientLigne.classList.toggle("hideM")
+						addDocLigne.classList.toggle("hideM")
+						toogleMenu.classList.toggle("hideM")
 
+					})
 				}
 			},
 
 			mounted() {
-				if(localStorage.logo)
+				if(localStorage.fact)
 				{
-					const logo = document.getElementById("Logo")
-					logo.src= `data:image/png;base64,${localStorage.logo}`
-				}
-				if(!localStorage.client)
-				{
-					localStorage.client = JSON.stringify([])
+					if (JSON.parse(localStorage.fact)[0].logo) {
+						const logo = document.getElementById("Logo")
+						logo.src = `data:image/png;base64,${JSON.parse(localStorage.fact)[0].logo}`
+					}
+					if (JSON.parse(localStorage.fact)[0].client) {
+						this.autoAddClients()
+					}
+					if (JSON.parse(localStorage.fact)[0].document) {
+						this.autoAddDocuments()
+					}
+					if (JSON.parse(localStorage.fact)[0].Facture) {
+						this.Facture = JSON.parse(localStorage.fact)[0].Facture
+					}
+					if (JSON.parse(localStorage.fact)[0].Referance) {
+						this.Referance = JSON.parse(localStorage.fact)[0].Referance
+					}
+					if (JSON.parse(localStorage.fact)[0].sociale) {
+						this.sociale = JSON.parse(localStorage.fact)[0].sociale
+					}
+					if (JSON.parse(localStorage.fact)[0].fiscale) {
+						this.fiscale = JSON.parse(localStorage.fact)[0].fiscale
+					}
+					if (JSON.parse(localStorage.fact)[0].Adresse) {
+						this.Adresse = JSON.parse(localStorage.fact)[0].Adresse
+					}
+					if (JSON.parse(localStorage.fact)[0].DC) {
+						this.DC = JSON.parse(localStorage.fact)[0].DC
+					}
+					if (JSON.parse(localStorage.fact)[0].DE) {
+						this.DE = JSON.parse(localStorage.fact)[0].DE
+					}
+					if (JSON.parse(localStorage.fact)[0].INFORMATIONS) {
+						this.INFORMATIONS = JSON.parse(localStorage.fact)[0].INFORMATIONS
+					}
+					if (JSON.parse(localStorage.fact)[0].Banque) {
+						this.Banque = JSON.parse(localStorage.fact)[0].Banque
+					}
+					if (JSON.parse(localStorage.fact)[0].RIB) {
+						this.RIB = JSON.parse(localStorage.fact)[0].RIB
+					}
+					//Champs Ajouter :
+					if (JSON.parse(localStorage.fact)[0].label) {
+						this.label = JSON.parse(localStorage.fact)[0].label
+					}
+					if (JSON.parse(localStorage.fact)[0].tabref) {
+						this.tabref = JSON.parse(localStorage.fact)[0].tabref
+					}
+					if (JSON.parse(localStorage.fact)[0].product) {
+						this.product = JSON.parse(localStorage.fact)[0].product
+					}
+					if (JSON.parse(localStorage.fact)[0].Quantity) {
+						this.Quantity = JSON.parse(localStorage.fact)[0].Quantity
+					}
+					if (JSON.parse(localStorage.fact)[0].unitPrix) {
+						this.unitPrix = JSON.parse(localStorage.fact)[0].unitPrix
+					}
+					if (JSON.parse(localStorage.fact)[0].Property) {
+						this.Property = JSON.parse(localStorage.fact)[0].Property
+					}
+					if (JSON.parse(localStorage.fact)[0].textajout) {
+						this.textajout = JSON.parse(localStorage.fact)[0].textajout
+					}
 				}
 				else 
 				{
-					this.autoAddClients()
+					localStorage.fact=JSON.stringify([{"document":[] , "client":[]}])
 				}
-				if (!localStorage.document) {
-					localStorage.document = JSON.stringify([])
-				}
-				else 
-				{
-					this.autoAddDocuments()
-				}
-				
-				if (localStorage.Facture) {
-					this.Facture = localStorage.Facture
-				}
-				if (localStorage.Referance) {
-					this.Referance = localStorage.Referance
-				}
-				if (localStorage.sociale) {
-					this.sociale = localStorage.sociale
-				}
-				if (localStorage.fiscale) {
-					this.fiscale = localStorage.fiscale
-				}
-				if (localStorage.Adresse) {
-					this.Adresse = localStorage.Adresse
-				}
-				if (localStorage.DC) {
-					this.DC = localStorage.DC
-				}
-				if (localStorage.DE) {
-					this.DE = localStorage.DE
-				}
-				if (localStorage.INFORMATIONS) {
-					this.INFORMATIONS = localStorage.INFORMATIONS
-				}
-				if (localStorage.Banque) {
-					this.Banque = localStorage.Banque
-				}
-				if (localStorage.RIB) {
-					this.RIB = localStorage.RIB
-				}
-				//Champs Ajouter :
-				if (localStorage.label) {
-					this.label = localStorage.label
-				}
-				if (localStorage.tabref) {
-					this.tabref = localStorage.tabref
-				}
-				if (localStorage.product) {
-					this.product = localStorage.product
-				}
-				if (localStorage.Quantity) {
-					this.Quantity = localStorage.Quantity
-				}
-				if (localStorage.unitPrix) {
-					this.unitPrix = localStorage.unitPrix
-				}
-				if (localStorage.Property) {
-					this.Property = localStorage.Property
-				}
-				if (localStorage.textajout) {
-					this.textajout = localStorage.textajout
-				}
-
-
 			},
 			watch: {
 				Facture(newFacture) {
-					localStorage.Facture = newFacture
+					const old =JSON.parse(localStorage.fact)[0]
+					old.Facture = newFacture
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				Referance(newReferance) {
-					localStorage.Referance = newReferance
+					const old = JSON.parse(localStorage.fact)[0]
+					old.Referance = newReferance
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				sociale(newsociale) {
-					localStorage.sociale = newsociale
+					const old = JSON.parse(localStorage.fact)[0]
+					old.sociale = newsociale
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				fiscale(newfiscale) {
-					localStorage.fiscale = newfiscale
+					const old = JSON.parse(localStorage.fact)[0]
+					old.fiscale = newfiscale
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				Adresse(newAdresse) {
-					localStorage.Adresse = newAdresse
+					const old = JSON.parse(localStorage.fact)[0]
+					old.Adresse = newAdresse
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				DC(newDC) {
-					localStorage.DC = newDC
+					const old = JSON.parse(localStorage.fact)[0]
+					old.DC = newDC
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				DE(newDE) {
-					localStorage.DE = newDE
+					const old = JSON.parse(localStorage.fact)[0]
+					old.DE = newDE
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				INFORMATIONS(newINFORMATIONS) {
-					localStorage.INFORMATIONS = newINFORMATIONS
+					const old = JSON.parse(localStorage.fact)[0]
+					old.INFORMATIONS = newINFORMATIONS
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				Banque(newBanque) {
-					localStorage.Banque = newBanque
+					const old = JSON.parse(localStorage.fact)[0]
+					old.Banque = newBanque
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				RIB(newRIB) {
-					localStorage.RIB = newRIB
+					const old = JSON.parse(localStorage.fact)[0]
+					old.RIB = newRIB
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
-				//Champs Ajouter :
 				label(newlabel) {
-					localStorage.label = newlabel
+					const old = JSON.parse(localStorage.fact)[0]
+					old.label = newlabel
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				tabref(newtabref) {
-					localStorage.tabref = newtabref
+					const old = JSON.parse(localStorage.fact)[0]
+					old.tabref = newtabref
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				product(newproduct) {
-					localStorage.product = newproduct
+					const old = JSON.parse(localStorage.fact)[0]
+					old.product = newproduct
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				Quantity(newQuantity) {
-					localStorage.Quantity = newQuantity
+					const old = JSON.parse(localStorage.fact)[0]
+					old.Quantity = newQuantity
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				unitPrix(newunitPrix) {
-					localStorage.unitPrix = newunitPrix
+					const old = JSON.parse(localStorage.fact)[0]
+					old.unitPrix = newunitPrix
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				Property(newProperty) {
-					localStorage.Property = newProperty
+					const old = JSON.parse(localStorage.fact)[0]
+					old.Property = newProperty
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 				textajout(newtextajout) {
-					localStorage.textajout = newtextajout
+					const old = JSON.parse(localStorage.fact)[0]
+					old.textajout = newtextajout
+					var table = JSON.parse(localStorage.fact);
+					table.splice(0, 1, old)
+					localStorage.fact = JSON.stringify(table)
 				},
 
 			}
