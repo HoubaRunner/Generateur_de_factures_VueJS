@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./js/test.js"></script>
+</head>
+<body>
+    <div style="width: 40vw;padding-left: 20px;padding-right: 20px;margin-left: auto;margin-right: auto;"
+						class="mt-2 mb-2 d-flex align-items-center">
+						<label for="fiscale" class="labelForm">Matricule fiscale :</label>
+						<input @input="verifyMatricule" type="text" class="form-control inputForm" name="fiscale"
+							id="fiscale" v-model="fiscale" placeholder="Matricule fiscale"
+							style="margin-right: auto;" />
+						<svg id="verify" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+							version="1.1" id="Capa_1" x="0px" y="0px" height="25" width="25"
+							style="fill:#20d43b;display: none;margin-left: 4px;" viewBox="0 0 288.941 288.941"
+							style="enable-background:new 0 0 288.941 288.941;" xml:space="preserve">
+							<g>
+								<path
+									d="M285.377,46.368c-4.74-4.704-12.439-4.704-17.179,0L96.309,217.114L20.734,142.61   c-4.74-4.704-12.439-4.704-17.179,0s-4.74,12.319,0,17.011l84.2,82.997c4.692,4.644,12.499,4.644,17.191,0l180.43-179.239   C290.129,58.687,290.129,51.06,285.377,46.368C280.637,41.664,290.129,51.06,285.377,46.368z" />
+								<g></g>
+								<g></g>
+								<g></g>
+								<g></g>
+								<g></g>
+								<g></g>
+							</g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+						</svg>
+						<svg id="cross" xmlns="http://www.w3.org/2000/svg" height="35" width="35"
+							style="stroke:#e80e48;opacity:0;" viewBox="0 0 24 24" stroke-width="2"
+							stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+							<line x1="18" y1="6" x2="6" y2="18" />
+							<line x1="6" y1="6" x2="18" y2="18" />
+						</svg>
+					</div>
+</body>
+</html>

@@ -297,8 +297,44 @@
 
 					<div style="width: 22vw" class="mt-2 mb-2 d-flex align-items-center">
 						<label for="RIB" class="labelForm">RIB : </label>
-						<input type="text" class="form-control inputForm" name="RIB" id="RIB" v-model="RIB"
-							placeholder="TN59 XXXX XXXX XXXX" />
+						<input @input="verifyTNRIB" type="text" class="form-control inputForm" name="RIB" id="RIB" v-model="RIB"
+							placeholder="0704 XXXX XXXX XXXX XXXX" />
+							<svg id="verifyRIB" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+							version="1.1" id="Capa_1" x="0px" y="0px" height="25" width="25"
+							style="fill:#20d43b;display: none;margin-left: 4px;" viewBox="0 0 288.941 288.941"
+							style="enable-background:new 0 0 288.941 288.941;" xml:space="preserve">
+							<g>
+								<path
+									d="M285.377,46.368c-4.74-4.704-12.439-4.704-17.179,0L96.309,217.114L20.734,142.61   c-4.74-4.704-12.439-4.704-17.179,0s-4.74,12.319,0,17.011l84.2,82.997c4.692,4.644,12.499,4.644,17.191,0l180.43-179.239   C290.129,58.687,290.129,51.06,285.377,46.368C280.637,41.664,290.129,51.06,285.377,46.368z" />
+								<g></g>
+								<g></g>
+								<g></g>
+								<g></g>
+								<g></g>
+								<g></g>
+							</g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+							<g></g>
+						</svg>
+						<svg id="crossRIB" xmlns="http://www.w3.org/2000/svg" height="35" width="35"
+							style="stroke:#e80e48;opacity:0;" viewBox="0 0 24 24" stroke-width="2"
+							stroke-linecap="round" stroke-linejoin="round" class="feather feather-x">
+							<line x1="18" y1="6" x2="6" y2="18" />
+							<line x1="6" y1="6" x2="18" y2="18" />
+						</svg>
 					</div>
 				</div>
 			</div>
@@ -318,6 +354,7 @@
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/@mczen-technologies/tui"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@mczentechnologies/tnrib"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
 	<script>
 		const app = Vue.createApp({
@@ -379,6 +416,27 @@
 					const cross = document.getElementById("cross")
 					if (e.target.value) {
 						if (new TUI(e.target.value).isValid()) {
+							verify.style.display = "flex"
+							cross.style.display = "none"
+							cross.style.opacity = 1
+						}
+						else {
+							verify.style.display = "none"
+							cross.style.display = "flex"
+							cross.style.opacity = 1
+						}
+					}
+					else {
+						cross.style.opacity = 0
+						verify.style.display = "none"
+						cross.style.display = "flex"
+					}
+				},
+				verifyTNRIB(e) {
+					const verify = document.getElementById("verifyRIB")
+					const cross = document.getElementById("crossRIB")
+					if (e.target.value) {
+						if (new TNRIB(e.target.value).isValid()) {
 							verify.style.display = "flex"
 							cross.style.display = "none"
 							cross.style.opacity = 1
