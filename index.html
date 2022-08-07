@@ -26,8 +26,8 @@
 				<div
 					style="background-color: white;width:35%;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);padding:20px;display:flex;align-content: center;flex-direction: column;align-items: center;">
 					<div style="display: flex;align-items:center;">
-						<input style="display: none;" type="file" id="imageInput" @input="HandleInput" />
-						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick" @click="blobToBase64" style="border: 1px solid #4e66f8;" />
+						<input style="display: none;" type="file" id="imageInput" @input="HandleInput" @click="blobToBase64" />
+						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick"  style="border: 1px solid #4e66f8;" />
 						<img src="image/close.png" style="margin-left: 10px;" @click="deleteImage"
 							class="deleteIconPhoto hideM" />
 						<img src="./image/eye.png" style="margin-left: 10px;" @click="handleDisabledImage"
