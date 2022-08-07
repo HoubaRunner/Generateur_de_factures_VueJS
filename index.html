@@ -27,10 +27,11 @@
 					style="background-color: white;width:35%;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);padding:20px;display:flex;align-content: center;flex-direction: column;align-items: center;">
 					<div style="display: flex;align-items:center;">
 						<input style="display: none;" type="file" id="imageInput" @input="HandleInput" />
-						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick"
-							style="border: 1px solid #4e66f8;" />
-						<img src="image/close.png" style="margin-left: 10px;" @click="deleteImage" class="deleteIconPhoto hideM" />
-						<img src="./image/eye.png" style="margin-left: 10px;" @click="handleDisabledImage" title="enable" class="iconForm eye" />
+						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick" @click="blobToBase64" style="border: 1px solid #4e66f8;" />
+						<img src="image/close.png" style="margin-left: 10px;" @click="deleteImage"
+							class="deleteIconPhoto hideM" />
+						<img src="./image/eye.png" style="margin-left: 10px;" @click="handleDisabledImage"
+							title="enable" class="iconForm eye" />
 					</div>
 					<div style="width: 20vw;margin-left: auto;margin-right: auto;" class="B2">
 						<label for="Facture"> </label>
@@ -81,7 +82,8 @@
 						class="mt-2 mb-2 d-flex align-items-center">
 						<label for="fiscale" class="labelForm">Matricule fiscale :</label>
 						<input @input="verifyMatricule" type="text" class="form-control inputForm" name="fiscale"
-							id="fiscale" v-model="fiscale" placeholder="Matricule fiscale"	style="margin: left 50px;width: 69%;" />
+							id="fiscale" v-model="fiscale" placeholder="Matricule fiscale"
+							style="margin: left 50px;width: 69%;" />
 						<svg id="verify" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
 							version="1.1" id="Capa_1" x="0px" y="0px" height="25" width="25"
 							style="fill:#20d43b;display: none;margin-left: 4px;" viewBox="0 0 288.941 288.941"
@@ -290,17 +292,20 @@
 					</div>
 					<div style="width: 22vw" class="mt-2 mb-2 d-flex align-items-center">
 						<label for="sociale" class="labelForm">Banque : </label>
-						<input type="text" class="form-control inputForm" name="Banque" id="Banque" v-model="Banque" placeholder="Banque" />
+						<input type="text" class="form-control inputForm" name="Banque" id="Banque" v-model="Banque"
+							placeholder="Banque" />
 					</div>
 
 					<div style="width: 22vw" class="mt-2 mb-2 d-flex align-items-center">
 						<label for="RIB" class="labelForm">RIB : </label>
-						<input @input="verifyTNRIB" type="text" class="form-control inputForm" name="RIB" id="RIB" v-model="RIB" style="margin-left: 21% ; width: 100%;" 
+						<input @input="verifyTNRIB" type="text" class="form-control inputForm" name="RIB" id="RIB"
+							v-model="RIB" style="margin-left: 21% ; width: 100%;"
 							placeholder="0704 XXXX XXXX XXXX XXXX" />
-							<svg id="verifyRIB" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-							version="1.1" id="Capa_1" x="0px" y="0px" height="25" width="25"
-							style="fill:#20d43b;display: none;margin-left: 4px;" viewBox="0 0 288.941 288.941"
-							style="enable-background:new 0 0 288.941 288.941;" xml:space="preserve">
+						<svg id="verifyRIB" xmlns="http://www.w3.org/2000/svg"
+							xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px"
+							height="25" width="25" style="fill:#20d43b;display: none;margin-left: 4px;"
+							viewBox="0 0 288.941 288.941" style="enable-background:new 0 0 288.941 288.941;"
+							xml:space="preserve">
 							<g>
 								<path
 									d="M285.377,46.368c-4.74-4.704-12.439-4.704-17.179,0L96.309,217.114L20.734,142.61   c-4.74-4.704-12.439-4.704-17.179,0s-4.74,12.319,0,17.011l84.2,82.997c4.692,4.644,12.499,4.644,17.191,0l180.43-179.239   C290.129,58.687,290.129,51.06,285.377,46.368C280.637,41.664,290.129,51.06,285.377,46.368z" />
@@ -346,7 +351,8 @@
 				<br>
 				<br>
 				<input class="btn btn-primary mx-1" type="file" id="jsonfileinput" @input="Import" />
-				<button type="button" class="btn btn-primary mx-1" type="file" id="jsonfileexport" @click="Export" >Export JSON</button>
+				<button type="button" class="btn btn-primary mx-1" type="file" id="jsonfileexport"
+					@click="Export">Export JSON</button>
 			</div>
 		</form>
 	</div>
@@ -450,6 +456,30 @@
 				deleteLigne(element) {
 					element.parentNode.removeChild(element);
 				},
+				blobToBase64(blob) {
+					var fileInput = document.getElementById('logo');
+					var preview = document.getElementById('logo');
+					fileInput.addEventListener('change', function (e) {
+						var url = URL.createObjectURL(e.target.files[0]);
+						preview.setAttribute('src', url);
+					});
+					function Upload() {
+						// preview can be image object or image element
+						var myCanvas = document.getElementById('MyCanvas');
+						var ctx = myCanvas.getContext('2d');
+						ctx.drawImage(preview, 0, 0);
+						var base64Str = myCanvas.toDataURL();
+						$.ajax({
+							url: '/PathToServer',
+							method: 'POST',
+							data: {
+								imageString: base64Str
+							},
+							success: function (data) { if (data && data.Success) { } },
+							error: function (a, b, c) { alert(c); }
+						});
+					}
+				},
 				getBase64Image(img) {
 					var canvas = document.createElement("canvas");
 					canvas.width = img.width;
@@ -461,13 +491,13 @@
 					var dataURL = canvas.toDataURL("image/png");
 
 					return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-				 },
-				 calculer() {
+				},
+				calculer() {
 					var ProduitS = 1.00
 					var Quantity = document.getElementById("Quantity").value
 					var unitPrix = document.getElementById("unitPrix").value
-					var des =document.getElementById("product").value
-					var ref =document.getElementById("tabref").value 
+					var des = document.getElementById("product").value
+					var ref = document.getElementById("tabref").value
 					var TVA = document.getElementById("choixTVA").value
 					document.getElementById("T1").innerHTML = TVA + "%"
 					ProduitS = parseFloat(Quantity * unitPrix).toFixed(3)
@@ -542,25 +572,25 @@
 				handleMenu() {
 					document.querySelector(".hideMenu").classList.toggle("hideM")
 				},
-				addProduct(e = null , ref = "" , des = "" , quantity = 0 , prixUni = 0 , Tva = 0 , total= "0.000 DT" , id2 = null) {
+				addProduct(e = null, ref = "", des = "", quantity = 0, prixUni = 0, Tva = 0, total = "0.000 DT", id2 = null) {
 					var id = id2 || this.generateID(5)
 					if (!id2) {
 						const old = JSON.parse(localStorage.fact)[0]
 						old.ligneFactures = [...(old.ligneFactures), {
 							id: id,
 							type: "PROD",
-							ref: ref , 
-							des : des , 
-							quantity : quantity , 
-							prixUni : prixUni , 
-							tva : Tva , 
-							total : total , 
+							ref: ref,
+							des: des,
+							quantity: quantity,
+							prixUni: prixUni,
+							tva: Tva,
+							total: total,
 						}]
 						var table = JSON.parse(localStorage.fact)
 						table.splice(0, 1, old)
 						localStorage.fact = JSON.stringify(table)
 					}
-					
+
 					const container = document.getElementById("custom_select_result")
 					const container2 = document.createElement("tr")
 					const tr = document.createElement("tr")
@@ -578,10 +608,10 @@
 					inputRef.classList.add("form-control")
 					inputRef.placeholder = "Référence"
 					tdRef.appendChild(inputRef)
-					inputRef.value=ref
-					inputRef.oninput=(e)=>{
+					inputRef.value = ref
+					inputRef.oninput = (e) => {
 						var old = JSON.parse(localStorage.fact)[0].ligneFactures.filter((element) => element.id === id)[0]
-						old.ref =  e.target.value
+						old.ref = e.target.value
 						var old2 = []
 						JSON.parse(localStorage.fact)[0].ligneFactures.forEach((element) => {
 							if (element.id != id) {
@@ -628,7 +658,7 @@
 					inputQuantity.type = "number"
 					inputQuantity.classList.add("form-control")
 					inputQuantity.style.width = "100px"
-					inputQuantity.value = quantity 
+					inputQuantity.value = quantity
 					tdQuantity.appendChild(inputQuantity)
 					/*td input Unitaire*/
 					const tdUnitaire = document.createElement("td")
@@ -648,7 +678,7 @@
                                     <option value="19">19%</option>`
 					tdSelect.appendChild(select)
 					const result = document.createElement("td")
-					select.value= Tva
+					select.value = Tva
 					/*result*/
 					result.innerText = total
 					container2.appendChild(tdRef)
@@ -668,7 +698,7 @@
 					const tva = document.createElement("td")
 					const base = document.createElement("td")
 					const montant = document.createElement("td")
-					tva.innerText = Tva+"%"
+					tva.innerText = Tva + "%"
 					base.innerText = total
 					montant.innerText = parseFloat((select.value * inputUnitaire.value * inputQuantity.value) / 100).toFixed(3) + " DT"
 					tva.classList.add("textCenter")
@@ -689,13 +719,11 @@
 						var old = JSON.parse(localStorage.fact)[0].ligneFactures.filter((element) => element.id === id)[0]
 						old.tva = select.value
 						var old2 = []
-						JSON.parse(localStorage.fact)[0].ligneFactures.forEach((element)=>{
-							if(element.id!=id)
-							{
+						JSON.parse(localStorage.fact)[0].ligneFactures.forEach((element) => {
+							if (element.id != id) {
 								old2.push(element)
 							}
-							else 
-							{
+							else {
 								old2.push(old)
 							}
 						})
@@ -813,7 +841,7 @@
 				calculSousTotal() {
 					const trs = document.querySelectorAll("#custom_select_result tr")
 					var result = 0
-				
+
 					trs.forEach((element, index) => {
 						const tds = element.childNodes
 						if (tds[5]) {
@@ -863,10 +891,9 @@
 					// ajoutTimbre.colSpan = "2"
 					// ajoutTimbre.parentNode.children[1].style.display = "none"
 				},
-				addSep(e = null , id2 = null ) {
+				addSep(e = null, id2 = null) {
 					var id = id2 || this.generateID(5)
-					if(!id2)
-					{
+					if (!id2) {
 						const old = JSON.parse(localStorage.fact)[0]
 						old.ligneFactures = [...(old.ligneFactures), {
 							id: id,
@@ -899,14 +926,14 @@
 					newElement.appendChild(td2)
 					container.appendChild(newElement)
 				},
-				addText(e = null , value = "" , id2 = null) {
+				addText(e = null, value = "", id2 = null) {
 					var id = id2 || this.generateID(5)
 					if (!id2) {
 						const old = JSON.parse(localStorage.fact)[0]
 						old.ligneFactures = [...(old.ligneFactures), {
 							id: id,
 							type: "TEXT",
-							value : ""
+							value: ""
 						}]
 						var table = JSON.parse(localStorage.fact);
 						table.splice(0, 1, old)
@@ -918,9 +945,9 @@
 					const td2 = document.createElement("td")
 					td1.colSpan = "6"
 					newElement.appendChild(td1)
-					const textA = document.createElement("textarea") 
-					textA.value=value
-					textA.oninput=(e)=>{
+					const textA = document.createElement("textarea")
+					textA.value = value
+					textA.oninput = (e) => {
 						var old = JSON.parse(localStorage.fact)[0].ligneFactures.filter((element) => element.id === id)[0]
 						old.value = e.target.value
 						const old2 = [...JSON.parse(localStorage.fact)[0].ligneFactures.filter((element) => element.id != id), old]
@@ -930,7 +957,7 @@
 						table.splice(0, 1, hold)
 						localStorage.fact = JSON.stringify(table)
 					}
-					textA.classList.add("form-control","form-control-lg") 
+					textA.classList.add("form-control", "form-control-lg")
 					td1.appendChild(textA)
 					newElement.appendChild(td2)
 					const image = document.createElement("img")
@@ -947,15 +974,14 @@
 					image.classList.add("iconForm", "eye")
 					container.appendChild(newElement)
 				},
-				addSousTotal(e = null,value = "0.000 DT" , id2 = null) {
+				addSousTotal(e = null, value = "0.000 DT", id2 = null) {
 					var id = id2 || this.generateID(5)
-					if(!id2)
-					{
+					if (!id2) {
 						const old = JSON.parse(localStorage.fact)[0]
 						old.ligneFactures = [...(old.ligneFactures), {
-							id:id,
+							id: id,
 							type: "ST",
-							value: value 
+							value: value
 						}]
 						var table = JSON.parse(localStorage.fact);
 						table.splice(0, 1, old)
@@ -1214,7 +1240,7 @@
 						var table = JSON.parse(localStorage.fact);
 						table.splice(0, 1, old)
 						localStorage.fact = JSON.stringify(table)
-						
+
 					}
 
 				},
@@ -1287,24 +1313,19 @@
 						this.autoAddDocuments()
 					}
 
-					if(JSON.parse(localStorage.fact)[0].ligneFactures)
-					{
-						JSON.parse(localStorage.fact)[0].ligneFactures.forEach((element)=>{
-							if(element.type=="ST")
-							{
-								this.addSousTotal(null,element.value,element.id)
+					if (JSON.parse(localStorage.fact)[0].ligneFactures) {
+						JSON.parse(localStorage.fact)[0].ligneFactures.forEach((element) => {
+							if (element.type == "ST") {
+								this.addSousTotal(null, element.value, element.id)
 							}
-							else if(element.type=="PROD")
-							{
+							else if (element.type == "PROD") {
 								this.addProduct(null, element.ref, element.des, element.quantity, element.prixUni, element.tva, element.total, element.id)
 							}
-							else if(element.type == "SEP")
-							{
-								this.addSep(null ,element.id)
+							else if (element.type == "SEP") {
+								this.addSep(null, element.id)
 							}
-							else if(element.type=="TEXT")
-							{
-								this.addText(null , element.value , element.id)
+							else if (element.type == "TEXT") {
+								this.addText(null, element.value, element.id)
 							}
 						})
 					}
@@ -1363,7 +1384,7 @@
 					}
 				}
 				else {
-					localStorage.fact = JSON.stringify([{ "document": [], "client": [] , "ligneFactures" : [] }])
+					localStorage.fact = JSON.stringify([{ "document": [], "client": [], "ligneFactures": [] }])
 				}
 			},
 			watch: {
