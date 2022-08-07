@@ -457,7 +457,7 @@
 					element.parentNode.removeChild(element);
 				},
 				blobToBase64(blob) {
-					var fileInput = document.getElementById('logo');
+					var fileInput = document.getElementById('imageInput');
 					var preview = document.getElementById('logo');
 					fileInput.addEventListener('change', function (e) {
 						var url = URL.createObjectURL(e.target.files[0]);
