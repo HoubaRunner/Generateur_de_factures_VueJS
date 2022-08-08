@@ -1,36 +1,72 @@
 {
-    "document": [
-        {
-            "id": "01114",
-            "key": "",
-            "value": ""
-        },
-        {
-            "id": "20653",
-            "key": "",
-            "value": ""
-        }
-    ],
+    "document": [],
     "client": [
         {
-            "id": "85965",
-            "key": "Assignment ",
-            "value": "Assignment "
-        },
-        {
-            "id": "68960",
-            "key": "Assignment ",
-            "value": "Assignment "
+            "id": "50745",
+            "key": "TEST1",
+            "value": "TEST1"
         }
     ],
-    "Facture": "ahmed",
-    "Referance": "ahmed",
-    "sociale": "ahmed",
-    "fiscale": "ahmed",
-    "Adresse": "ahmed",
-    "DC": "2022-08-04",
-    "DE": "2022-08-26",
-    "INFORMATIONS": "ahmed",
-    "Banque": "ahmed",
-    "RIB": "ahmed"
+    "ligneFactures": [
+        {
+            "id": "97308",
+            "type": "PROD",
+            "ref": "TEST1",
+            "des": "TEST1",
+            "quantity": "7",
+            "prixUni": "13",
+            "tva": "13",
+            "total": "91.000 DT"
+        },
+        {
+            "id": "59861",
+            "type": "PROD",
+            "ref": "TEST1",
+            "des": "TEST1",
+            "quantity": "4",
+            "prixUni": "3",
+            "tva": "19",
+            "total": "12.000 DT"
+        },
+        {
+            "id": "14225",
+            "type": "ST",
+            "value": "0.000 DT"
+        },
+        {
+            "id": "16399",
+            "type": "PROD",
+            "ref": "TEST1",
+            "des": "TEST1",
+            "quantity": "12",
+            "prixUni": "8",
+            "tva": "19",
+            "total": "96.000 DT"
+        },
+        {
+            "id": "19035",
+            "type": "TEXT",
+            "value": ""
+        },
+        {
+            "id": "74065",
+            "type": "SEP"
+        },
+        {
+            "id": "81554",
+            "type": "ST",
+            "value": "0.000 DT"
+        }
+    ],
+    "RIB": "07040005810111129653",
+    "fiscale": "0789012H",
+    "logo": "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",
+    "Facture": "TEST1",
+    "Referance": "TEST1",
+    "sociale": "TEST1",
+    "Adresse": "TEST1",
+    "DC": "2022-08-01",
+    "DE": "2022-08-09",
+    "INFORMATIONS": "TEST1",
+    "Banque": "TEST1"
 }
