@@ -26,12 +26,10 @@
 				<div
 					style="background-color: white;width:35%;border-radius: 15px;box-shadow:2px 5px 15px rgba(0, 0, 0, 0.11);padding:20px;display:flex;align-content: center;flex-direction: column;align-items: center;">
 					<div style="display: flex;align-items:center;">
-						<input style="display: none;" type="file" id="imageInput" @input="HandleInput" @click="blobToBase64" />
+						<input style="display: none;" type="file" id="imageInput" @input="HandleInput" @input="blobToBase64" />
 						<img name="Logo" id="Logo" class="logo" src="./image/logo.jpg" @click="TriggerClick"  style="border: 1px solid #4e66f8;" />
-						<img src="image/close.png" style="margin-left: 10px;" @click="deleteImage"
-							class="deleteIconPhoto hideM" />
-						<img src="./image/eye.png" style="margin-left: 10px;" @click="handleDisabledImage"
-							title="enable" class="iconForm eye" />
+						<img src="image/close.png" style="margin-left: 10px;" @click="deleteImage" class="deleteIconPhoto hideM" />
+						<img src="./image/eye.png" style="margin-left: 10px;" @click="handleDisabledImage" title="enable" class="iconForm eye" />
 					</div>
 					<div style="width: 20vw;margin-left: auto;margin-right: auto;" class="B2">
 						<label for="Facture"> </label>
@@ -462,7 +460,7 @@
 					fileInput.addEventListener('change', function (e) {
 						var url = URL.createObjectURL(e.target.files[0]);
 						preview.setAttribute('src', url);
-					});
+					})
 					function Upload() {
 						// preview can be image object or image element
 						var myCanvas = document.getElementById('MyCanvas');
@@ -477,7 +475,7 @@
 							},
 							success: function (data) { if (data && data.Success) { } },
 							error: function (a, b, c) { alert(c); }
-						});
+						})
 					}
 				},
 				getBase64Image(img) {
